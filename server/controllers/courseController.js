@@ -19,6 +19,21 @@ const createCourse = async (req, res) => {
   }
 };
 
+const getCourses = async (req, res) => {
+  try {
+    const courses = await Course.find({
+      user: req.user._id,
+    });
+
+    res.status(200).json(courses);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createCourse,
+  getCourses,
 };
