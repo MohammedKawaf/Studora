@@ -61,8 +61,41 @@ const deleteCourse = async (req, res) => {
   }
 };
 
+const updateCourse = async (req, res) => {
+  try {
+    const { name, code, color } = req.body;
+
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found",
+      });
+    }
+
+    if (course.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({
+        message: "Not authorized",
+      });
+    }
+
+    course.name = name || course.name;
+    course.code = code || course.code;
+    course.color = color || course.color;
+
+    const updatedCourse = await course.save();
+
+    res.status(200).json(updatedCourse);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createCourse,
   getCourses,
   deleteCourse,
+  updateCourse,
 };
