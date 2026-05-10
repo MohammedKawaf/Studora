@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   createCourse,
   getCourses,
+  deleteCourse,
 } = require("../controllers/courseController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -12,5 +13,7 @@ const { protect } = require("../middleware/authMiddleware");
 router.post("/", protect, createCourse);
 
 router.get("/", protect, getCourses);
+
+router.delete("/:id", protect, deleteCourse);
 
 module.exports = router;
