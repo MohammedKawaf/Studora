@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
@@ -7,6 +7,13 @@ function Dashboard() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [color, setColor] = useState("#2563eb");
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   const fetchCourses = async () => {
     try {
@@ -60,7 +67,8 @@ function Dashboard() {
       <nav>
         <Link to="/">Dashboard</Link>{" "}
         <Link to="/login">Login</Link>{" "}
-        <Link to="/register">Register</Link>
+        <Link to="/register">Register</Link>{" "}
+        <button onClick={handleLogout}>Logout</button>
       </nav>
 
       <h1>Dashboard</h1>
@@ -96,7 +104,6 @@ function Dashboard() {
       {courses.map((course) => (
         <div key={course._id}>
           <h3>{course.name}</h3>
-
           <p>{course.code}</p>
         </div>
       ))}
