@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
@@ -56,6 +57,12 @@ function Dashboard() {
 
   return (
     <div>
+      <nav>
+        <Link to="/">Dashboard</Link>{" "}
+        <Link to="/login">Login</Link>{" "}
+        <Link to="/register">Register</Link>
+      </nav>
+
       <h1>Dashboard</h1>
 
       <h2>Create Course</h2>
@@ -89,6 +96,7 @@ function Dashboard() {
       {courses.map((course) => (
         <div key={course._id}>
           <h3>{course.name}</h3>
+
           <p>{course.code}</p>
         </div>
       ))}

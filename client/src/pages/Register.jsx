@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Register() {
@@ -6,26 +7,35 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await api.post("/auth/register", {
+      await api.post("/auth/register", {
         username,
         email,
         password,
       });
 
-      console.log(response.data);
       alert("Account created successfully!");
+
+      navigate("/login");
     } catch (error) {
       console.log(error.response?.data || error.message);
+
       alert("Registration failed");
     }
   };
 
   return (
     <div>
+      <nav>
+        <Link to="/">Dashboard</Link>{" "}
+        <Link to="/login">Login</Link>
+      </nav>
+
       <h1>Create account</h1>
 
       <form onSubmit={handleRegister}>
