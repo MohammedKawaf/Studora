@@ -62,6 +62,31 @@ function Dashboard() {
     }
   };
 
+  const handleDeleteCourse = async (courseId, courseName) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete ${courseName}?`
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.delete(`/courses/${courseId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchCourses();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not delete course");
+    }
+  };
+
   return (
     <div>
       <nav>
@@ -105,6 +130,10 @@ function Dashboard() {
         <div key={course._id}>
           <h3>{course.name}</h3>
           <p>{course.code}</p>
+
+          <button onClick={() => handleDeleteCourse(course._id, course.name)}>
+            Delete
+          </button>
         </div>
       ))}
     </div>
