@@ -1,0 +1,99 @@
+import { useEffect, useState } from "react";
+import api from "../services/api";
+
+function Dashboard() {
+  const [courses, setCourses] = useState([]);
+  const [name, setName] = useState("");
+  const [code, setCode] = useState("");
+  const [color, setColor] = useState("#2563eb");
+
+  const fetchCourses = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.get("/courses", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setCourses(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const handleCreateCourse = async (e) => {
+    e.preventDefault();
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.post(
+        "/courses",
+        { name, code, color },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setName("");
+      setCode("");
+      setColor("#2563eb");
+
+      fetchCourses();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not create course");
+    }
+  };
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+
+      <h2>Create Course</h2>
+
+      <form onSubmit={handleCreateCourse}>
+        <input
+          type="text"
+          placeholder="Course name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Course code"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+        />
+
+        <input
+          type="color"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+        />
+
+        <button type="submit">Add Course</button>
+      </form>
+
+      <h2>Your Courses</h2>
+
+      {courses.map((course) => (
+        <div key={course._id}>
+          <h3>{course.name}</h3>
+          <p>{course.code}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default Dashboard;

@@ -1,12 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 
+import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<h1>Studora Dashboard</h1>} />
+      <Route path="/" element={<Dashboard />} />
 
       <Route path="/login" element={<Login />} />
 
