@@ -7,12 +7,29 @@ function Dashboard() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [color, setColor] = useState("#2563eb");
+  const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.get("/auth/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUser(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
   };
 
   const fetchCourses = async () => {
@@ -33,6 +50,7 @@ function Dashboard() {
 
   useEffect(() => {
     fetchCourses();
+    fetchUser();
   }, []);
 
   const handleCreateCourse = async (e) => {
@@ -99,6 +117,8 @@ function Dashboard() {
 
       <h1>Dashboard</h1>
 
+      {user && <h2>Welcome, {user.username}</h2>}
+
       <h2>Create Course</h2>
 
       <form onSubmit={handleCreateCourse}>
@@ -130,6 +150,7 @@ function Dashboard() {
       {courses.map((course) => (
         <div key={course._id}>
           <h3>{course.name}</h3>
+
           <p>{course.code}</p>
 
           <button onClick={() => handleDeleteCourse(course._id, course.name)}>
