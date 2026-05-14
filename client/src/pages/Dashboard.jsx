@@ -91,6 +91,7 @@ function Dashboard() {
     <div>
       <nav>
         <Link to="/">Dashboard</Link>{" "}
+        <Link to="/notes">Notes</Link>{" "}
         <Link to="/login">Login</Link>{" "}
         <Link to="/register">Register</Link>{" "}
         <button onClick={handleLogout}>Logout</button>
