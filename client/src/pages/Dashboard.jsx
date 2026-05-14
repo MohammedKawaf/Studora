@@ -9,6 +9,10 @@ function Dashboard() {
   const [color, setColor] = useState("#2563eb");
   const [user, setUser] = useState(null);
 
+  const [editingCourseId, setEditingCourseId] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editCode, setEditCode] = useState("");
+
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -98,6 +102,34 @@ function Dashboard() {
     }
   };
 
+  const handleEditCourse = async (courseId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.put(
+        `/courses/${courseId}`,
+        {
+          name: editName,
+          code: editCode,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setEditingCourseId(null);
+      setEditName("");
+      setEditCode("");
+
+      fetchCourses();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not update course");
+    }
+  };
+
   return (
     <div>
       <Navbar user={user} />
@@ -136,13 +168,51 @@ function Dashboard() {
 
       {courses.map((course) => (
         <div key={course._id}>
-          <h3>{course.name}</h3>
+          {editingCourseId === course._id ? (
+            <>
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
 
-          <p>{course.code}</p>
+              <input
+                type="text"
+                value={editCode}
+                onChange={(e) => setEditCode(e.target.value)}
+              />
 
-          <button onClick={() => handleDeleteCourse(course._id, course.name)}>
-            Delete
-          </button>
+              <button onClick={() => handleEditCourse(course._id)}>
+                Save
+              </button>
+
+              <button onClick={() => setEditingCourseId(null)}>
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <h3>{course.name}</h3>
+
+              <p>{course.code}</p>
+
+              <button
+                onClick={() => {
+                  setEditingCourseId(course._id);
+                  setEditName(course.name);
+                  setEditCode(course.code);
+                }}
+              >
+                Edit
+              </button>
+
+              <button
+                onClick={() => handleDeleteCourse(course._id, course.name)}
+              >
+                Delete
+              </button>
+            </>
+          )}
         </div>
       ))}
     </div>
