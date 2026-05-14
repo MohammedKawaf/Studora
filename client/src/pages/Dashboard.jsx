@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
@@ -8,13 +8,6 @@ function Dashboard() {
   const [code, setCode] = useState("");
   const [color, setColor] = useState("#2563eb");
   const [user, setUser] = useState(null);
-
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
 
   const fetchUser = async () => {
     try {
@@ -107,20 +100,7 @@ function Dashboard() {
 
   return (
     <div>
-      <nav>
-        <Link to="/">Dashboard</Link>{" "}
-
-        <Link to="/notes">Notes</Link>{" "}
-
-        {!user && (
-          <>
-            <Link to="/login">Login</Link>{" "}
-            <Link to="/register">Register</Link>{" "}
-          </>
-        )}
-
-        {user && <button onClick={handleLogout}>Logout</button>}
-      </nav>
+      <Navbar user={user} />
 
       <h1>Dashboard</h1>
 

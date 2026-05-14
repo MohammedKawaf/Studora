@@ -32,7 +32,6 @@ function Register() {
   return (
     <div>
       <nav>
-        <Link to="/">Dashboard</Link>{" "}
         <Link to="/login">Login</Link>
       </nav>
 
