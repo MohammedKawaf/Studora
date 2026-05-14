@@ -10,6 +10,10 @@ function Notes() {
   const [content, setContent] = useState("");
   const [course, setCourse] = useState("");
 
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -110,6 +114,34 @@ function Notes() {
     }
   };
 
+  const handleEditNote = async (noteId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.put(
+        `/notes/${noteId}`,
+        {
+          title: editTitle,
+          content: editContent,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setEditingNoteId(null);
+      setEditTitle("");
+      setEditContent("");
+
+      fetchNotes();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not update note");
+    }
+  };
+
   return (
     <div>
       <nav>
@@ -153,18 +185,54 @@ function Notes() {
 
       {notes.map((note) => (
         <div key={note._id}>
-          <h3>{note.title}</h3>
-          <p>{note.content}</p>
+          {editingNoteId === note._id ? (
+            <>
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
 
-          {note.course && (
-            <p>
-              Course: {note.course.name} ({note.course.code})
-            </p>
+              <textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+              />
+
+              <button onClick={() => handleEditNote(note._id)}>
+                Save
+              </button>
+
+              <button onClick={() => setEditingNoteId(null)}>
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <h3>{note.title}</h3>
+
+              <p>{note.content}</p>
+
+              {note.course && (
+                <p>
+                  Course: {note.course.name} ({note.course.code})
+                </p>
+              )}
+
+              <button
+                onClick={() => {
+                  setEditingNoteId(note._id);
+                  setEditTitle(note.title);
+                  setEditContent(note.content);
+                }}
+              >
+                Edit Note
+              </button>
+
+              <button onClick={() => handleDeleteNote(note._id)}>
+                Delete Note
+              </button>
+            </>
           )}
-
-          <button onClick={() => handleDeleteNote(note._id)}>
-            Delete Note
-          </button>
         </div>
       ))}
     </div>
