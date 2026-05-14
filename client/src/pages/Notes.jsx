@@ -78,6 +78,31 @@ function Notes() {
     }
   };
 
+  const handleDeleteNote = async (noteId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this note?"
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.delete(`/notes/${noteId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchNotes();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not delete note");
+    }
+  };
+
   return (
     <div>
       <nav>
@@ -130,6 +155,10 @@ function Notes() {
               Course: {note.course.name} ({note.course.code})
             </p>
           )}
+
+          <button onClick={() => handleDeleteNote(note._id)}>
+            Delete Note
+          </button>
         </div>
       ))}
     </div>
