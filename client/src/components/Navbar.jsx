@@ -10,13 +10,18 @@ function Navbar({ user }) {
 
   return (
     <nav>
-      <Link to="/">Dashboard</Link>{" "}
-
-      <Link to="/notes">Notes</Link>{" "}
+      {user && (
+        <>
+          <Link to="/">Home</Link>{" "}
+          <Link to="/courses">Courses</Link>{" "}
+          <Link to="/notes">Notes</Link>{" "}
+        </>
+      )}
 
       {!user && (
         <>
           <Link to="/login">Login</Link>{" "}
+
           <Link to="/register">Register</Link>{" "}
         </>
       )}

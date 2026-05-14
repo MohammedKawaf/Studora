@@ -1,9 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 
-import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
+import Courses from "./pages/Courses";
+import Notes from "./pages/Notes";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Notes from "./pages/Notes";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -14,7 +15,16 @@ function App() {
         path="/"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/courses"
+        element={
+          <ProtectedRoute>
+            <Courses />
           </ProtectedRoute>
         }
       />

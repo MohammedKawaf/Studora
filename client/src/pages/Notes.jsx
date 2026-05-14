@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
@@ -13,13 +13,6 @@ function Notes() {
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
-
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
 
   const fetchNotes = async () => {
     try {
@@ -144,11 +137,7 @@ function Notes() {
 
   return (
     <div>
-      <nav>
-        <Link to="/">Dashboard</Link>{" "}
-        <Link to="/notes">Notes</Link>{" "}
-        <button onClick={handleLogout}>Logout</button>
-      </nav>
+      <Navbar user={true} />
 
       <h1>Notes</h1>
 

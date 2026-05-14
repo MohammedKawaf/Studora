@@ -1,8 +1,15 @@
+import Navbar from "../components/Navbar";
+
 function Home() {
   return (
     <div>
-      <h1>Welcome to Studora</h1>
-      <p>Your all-in-one student platform.</p>
+      <Navbar user={true} />
+
+      <h1>Studora Dashboard</h1>
+
+      <p>Welcome to Studora.</p>
+
+      <p>Your student overview will appear here.</p>
     </div>
   );
 }
