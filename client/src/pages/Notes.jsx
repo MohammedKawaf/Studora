@@ -14,6 +14,8 @@ function Notes() {
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
 
+  const [selectedCourse, setSelectedCourse] = useState("");
+
   const fetchNotes = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -135,6 +137,14 @@ function Notes() {
     }
   };
 
+  const filteredNotes = notes.filter((note) => {
+    if (!selectedCourse) {
+      return true;
+    }
+
+    return note.course?._id === selectedCourse;
+  });
+
   return (
     <div>
       <Navbar user={true} />
@@ -172,7 +182,20 @@ function Notes() {
 
       <h2>Your Notes</h2>
 
-      {notes.map((note) => (
+      <select
+        value={selectedCourse}
+        onChange={(e) => setSelectedCourse(e.target.value)}
+      >
+        <option value="">All Courses</option>
+
+        {courses.map((courseItem) => (
+          <option key={courseItem._id} value={courseItem._id}>
+            {courseItem.name}
+          </option>
+        ))}
+      </select>
+
+      {filteredNotes.map((note) => (
         <div key={note._id}>
           {editingNoteId === note._id ? (
             <>
@@ -187,13 +210,9 @@ function Notes() {
                 onChange={(e) => setEditContent(e.target.value)}
               />
 
-              <button onClick={() => handleEditNote(note._id)}>
-                Save
-              </button>
+              <button onClick={() => handleEditNote(note._id)}>Save</button>
 
-              <button onClick={() => setEditingNoteId(null)}>
-                Cancel
-              </button>
+              <button onClick={() => setEditingNoteId(null)}>Cancel</button>
             </>
           ) : (
             <>
