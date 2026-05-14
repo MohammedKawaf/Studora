@@ -109,10 +109,17 @@ function Dashboard() {
     <div>
       <nav>
         <Link to="/">Dashboard</Link>{" "}
+
         <Link to="/notes">Notes</Link>{" "}
-        <Link to="/login">Login</Link>{" "}
-        <Link to="/register">Register</Link>{" "}
-        <button onClick={handleLogout}>Logout</button>
+
+        {!user && (
+          <>
+            <Link to="/login">Login</Link>{" "}
+            <Link to="/register">Register</Link>{" "}
+          </>
+        )}
+
+        {user && <button onClick={handleLogout}>Logout</button>}
       </nav>
 
       <h1>Dashboard</h1>
