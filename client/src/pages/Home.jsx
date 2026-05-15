@@ -80,6 +80,11 @@ function Home() {
     fetchTasks();
   }, []);
 
+  const upcomingDeadlines = tasks
+    .filter((task) => task.dueDate && !task.completed)
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+    .slice(0, 5);
+
   return (
     <div>
       <Navbar user={true} />
@@ -104,6 +109,26 @@ function Home() {
         <h3>Tasks</h3>
         <p>{tasks.length}</p>
       </div>
+
+      <h2>Upcoming Deadlines</h2>
+
+      {upcomingDeadlines.length === 0 ? (
+        <p>No upcoming deadlines.</p>
+      ) : (
+        upcomingDeadlines.map((task) => (
+          <div key={task._id}>
+            <h3>{task.title}</h3>
+
+            {task.course && (
+              <p>
+                Course: {task.course.name} ({task.course.code})
+              </p>
+            )}
+
+            <p>Due date: {new Date(task.dueDate).toLocaleDateString()}</p>
+          </div>
+        ))
+      )}
     </div>
   );
 }

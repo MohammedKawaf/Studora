@@ -55,6 +55,11 @@ function Tasks() {
   const handleCreateTask = async (e) => {
     e.preventDefault();
 
+    if (!title || !course || !dueDate) {
+    alert("Please fill in all fields");
+    return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
