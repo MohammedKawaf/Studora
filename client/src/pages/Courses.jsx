@@ -2,7 +2,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
-function Dashboard() {
+function Courses() {
   const [courses, setCourses] = useState([]);
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -12,6 +12,8 @@ function Dashboard() {
   const [editingCourseId, setEditingCourseId] = useState(null);
   const [editName, setEditName] = useState("");
   const [editCode, setEditCode] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchUser = async () => {
     try {
@@ -130,11 +132,19 @@ function Dashboard() {
     }
   };
 
+  const filteredCourses = courses.filter((course) => {
+    const courseName = course.name.toLowerCase();
+    const courseCode = course.code.toLowerCase();
+    const search = searchTerm.toLowerCase();
+
+    return courseName.includes(search) || courseCode.includes(search);
+  });
+
   return (
     <div>
       <Navbar user={user} />
 
-      <h1>Dashboard</h1>
+      <h1>Courses</h1>
 
       {user && <h2>Welcome, {user.username}</h2>}
 
@@ -166,7 +176,14 @@ function Dashboard() {
 
       <h2>Your Courses</h2>
 
-      {courses.map((course) => (
+      <input
+        type="text"
+        placeholder="Search courses..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      {filteredCourses.map((course) => (
         <div key={course._id}>
           {editingCourseId === course._id ? (
             <>
@@ -219,4 +236,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Courses;

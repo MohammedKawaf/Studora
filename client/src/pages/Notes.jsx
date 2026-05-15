@@ -15,6 +15,7 @@ function Notes() {
   const [editContent, setEditContent] = useState("");
 
   const [selectedCourse, setSelectedCourse] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchNotes = async () => {
     try {
@@ -138,11 +139,15 @@ function Notes() {
   };
 
   const filteredNotes = notes.filter((note) => {
-    if (!selectedCourse) {
-      return true;
-    }
+    const matchesCourse = selectedCourse
+      ? note.course?._id === selectedCourse
+      : true;
 
-    return note.course?._id === selectedCourse;
+    const matchesSearch =
+      note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesCourse && matchesSearch;
   });
 
   return (
@@ -181,6 +186,13 @@ function Notes() {
       </form>
 
       <h2>Your Notes</h2>
+
+      <input
+        type="text"
+        placeholder="Search notes..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
 
       <select
         value={selectedCourse}

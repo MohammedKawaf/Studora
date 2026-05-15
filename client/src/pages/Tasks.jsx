@@ -15,6 +15,10 @@ function Tasks() {
   const [editCourse, setEditCourse] = useState("");
   const [editDueDate, setEditDueDate] = useState("");
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
   const fetchTasks = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -56,8 +60,8 @@ function Tasks() {
     e.preventDefault();
 
     if (!title || !course || !dueDate) {
-    alert("Please fill in all fields");
-    return;
+      alert("Please fill in all fields");
+      return;
     }
 
     try {
@@ -164,6 +168,25 @@ function Tasks() {
     }
   };
 
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesCourse = selectedCourse
+      ? task.course?._id === selectedCourse
+      : true;
+
+    const matchesStatus =
+      selectedStatus === "completed"
+        ? task.completed
+        : selectedStatus === "not-completed"
+        ? !task.completed
+        : true;
+
+    return matchesSearch && matchesCourse && matchesStatus;
+  });
+
   return (
     <div>
       <Navbar user={true} />
@@ -201,7 +224,36 @@ function Tasks() {
 
       <h2>Your Tasks</h2>
 
-      {tasks.map((task) => (
+      <input
+        type="text"
+        placeholder="Search tasks..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      <select
+        value={selectedCourse}
+        onChange={(e) => setSelectedCourse(e.target.value)}
+      >
+        <option value="">All Courses</option>
+
+        {courses.map((courseItem) => (
+          <option key={courseItem._id} value={courseItem._id}>
+            {courseItem.name}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={selectedStatus}
+        onChange={(e) => setSelectedStatus(e.target.value)}
+      >
+        <option value="">All Statuses</option>
+        <option value="completed">Completed</option>
+        <option value="not-completed">Not completed</option>
+      </select>
+
+      {filteredTasks.map((task) => (
         <div key={task._id}>
           {editingTaskId === task._id ? (
             <>
@@ -230,13 +282,9 @@ function Tasks() {
                 onChange={(e) => setEditDueDate(e.target.value)}
               />
 
-              <button onClick={() => handleEditTask(task._id)}>
-                Save
-              </button>
+              <button onClick={() => handleEditTask(task._id)}>Save</button>
 
-              <button onClick={() => setEditingTaskId(null)}>
-                Cancel
-              </button>
+              <button onClick={() => setEditingTaskId(null)}>Cancel</button>
             </>
           ) : (
             <>
@@ -250,19 +298,14 @@ function Tasks() {
 
               {task.dueDate && (
                 <p>
-                  Due date:{" "}
-                  {new Date(task.dueDate).toLocaleDateString()}
+                  Due date: {new Date(task.dueDate).toLocaleDateString()}
                 </p>
               )}
 
-              <p>
-                Status: {task.completed ? "Completed" : "Not completed"}
-              </p>
+              <p>Status: {task.completed ? "Completed" : "Not completed"}</p>
 
               <button onClick={() => handleToggleCompleted(task._id)}>
-                {task.completed
-                  ? "Mark as incomplete"
-                  : "Mark as completed"}
+                {task.completed ? "Mark as incomplete" : "Mark as completed"}
               </button>
 
               <button
