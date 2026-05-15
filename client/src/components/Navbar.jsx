@@ -15,13 +15,13 @@ function Navbar({ user }) {
           <Link to="/">Home</Link>{" "}
           <Link to="/courses">Courses</Link>{" "}
           <Link to="/notes">Notes</Link>{" "}
+          <Link to="/tasks">Tasks</Link>{" "}
         </>
       )}
 
       {!user && (
         <>
           <Link to="/login">Login</Link>{" "}
-
           <Link to="/register">Register</Link>{" "}
         </>
       )}
