@@ -6,6 +6,7 @@ import Notes from "./pages/Notes";
 import Tasks from "./pages/Tasks";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Calendar from "./pages/Calendar";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -44,6 +45,15 @@ function App() {
         element={
           <ProtectedRoute>
             <Tasks />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/calendar"
+        element={
+          <ProtectedRoute>
+            <Calendar />
           </ProtectedRoute>
         }
       />

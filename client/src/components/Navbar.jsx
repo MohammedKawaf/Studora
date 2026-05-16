@@ -16,6 +16,7 @@ function Navbar({ user }) {
           <Link to="/courses">Courses</Link>{" "}
           <Link to="/notes">Notes</Link>{" "}
           <Link to="/tasks">Tasks</Link>{" "}
+          <Link to="/calendar">Calendar</Link>{" "}
         </>
       )}
 
