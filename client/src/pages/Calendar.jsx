@@ -21,6 +21,13 @@ function Calendar() {
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showEventModal, setShowEventModal] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+
   const fetchEvents = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -90,6 +97,9 @@ function Calendar() {
       setDate("");
       setTime("");
       setCourse("");
+
+      setSelectedDate(null);
+      setShowEventModal(false);
 
       fetchEvents();
     } catch (error) {
@@ -191,6 +201,20 @@ function Calendar() {
     calendarDays.push(day);
   }
 
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch = event.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesType = selectedType ? event.type === selectedType : true;
+
+    const matchesCourse = selectedCourse
+      ? event.course?._id === selectedCourse
+      : true;
+
+    return matchesSearch && matchesType && matchesCourse;
+  });
+
   const getEventsForDay = (day) => {
     if (!day) {
       return [];
@@ -205,6 +229,20 @@ function Calendar() {
         eventDate.getDate() === day
       );
     });
+  };
+
+  const handleDayClick = (day) => {
+    if (!day) {
+      return;
+    }
+
+    const clickedDate = new Date(year, month, day);
+    const formattedDate = clickedDate.toISOString().split("T")[0];
+
+    setSelectedDate(formattedDate);
+    setDate(formattedDate);
+
+    setShowEventModal(true);
   };
 
   return (
@@ -236,7 +274,11 @@ function Calendar() {
 
           <div className="calendar-grid">
             {calendarDays.map((day, index) => (
-              <div key={index} className="calendar-day">
+              <div
+                key={index}
+                className="calendar-day"
+                onClick={() => handleDayClick(day)}
+              >
                 {day && (
                   <>
                     <span className="calendar-day-number">{day}</span>
@@ -254,18 +296,82 @@ function Calendar() {
           </div>
         </section>
 
-        <section className="card">
-          <h2>Create Event</h2>
+        {showEventModal && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h2>Create Event</h2>
 
-          <form onSubmit={handleCreateEvent} className="form">
+              <p>
+                Selected date:{" "}
+                <strong>{new Date(selectedDate).toLocaleDateString()}</strong>
+              </p>
+
+              <form onSubmit={handleCreateEvent} className="form">
+                <input
+                  type="text"
+                  placeholder="Event title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+
+                <select value={type} onChange={(e) => setType(e.target.value)}>
+                  <option value="exam">Exam</option>
+                  <option value="assignment">Assignment</option>
+                  <option value="lecture">Lecture</option>
+                  <option value="meeting">Meeting</option>
+                  <option value="study">Study</option>
+                  <option value="other">Other</option>
+                </select>
+
+                <input
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                />
+
+                <select
+                  value={course}
+                  onChange={(e) => setCourse(e.target.value)}
+                >
+                  <option value="">Select course</option>
+
+                  {courses.map((courseItem) => (
+                    <option key={courseItem._id} value={courseItem._id}>
+                      {courseItem.name}
+                    </option>
+                  ))}
+                </select>
+
+                <button type="submit">Add Event</button>
+
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setShowEventModal(false)}
+                >
+                  Cancel
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        <section className="card">
+          <h2>Your Events</h2>
+
+          <div className="calendar-filters">
             <input
               type="text"
-              placeholder="Event title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Search events..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
 
-            <select value={type} onChange={(e) => setType(e.target.value)}>
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+            >
+              <option value="">All Types</option>
               <option value="exam">Exam</option>
               <option value="assignment">Assignment</option>
               <option value="lecture">Lecture</option>
@@ -274,20 +380,11 @@ function Calendar() {
               <option value="other">Other</option>
             </select>
 
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-
-            <input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-            />
-
-            <select value={course} onChange={(e) => setCourse(e.target.value)}>
-              <option value="">Select course</option>
+            <select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+            >
+              <option value="">All Courses</option>
 
               {courses.map((courseItem) => (
                 <option key={courseItem._id} value={courseItem._id}>
@@ -295,15 +392,9 @@ function Calendar() {
                 </option>
               ))}
             </select>
+          </div>
 
-            <button type="submit">Add Event</button>
-          </form>
-        </section>
-
-        <section className="card">
-          <h2>Your Events</h2>
-
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <div key={event._id} className="list-item">
               {editingEventId === event._id ? (
                 <div className="edit-form">

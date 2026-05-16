@@ -267,3 +267,38 @@ button:hover {
   border-radius: 8px;
   margin-bottom: 5px;
 }
+.calendar-day {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.calendar-day:hover {
+  background-color: #eff6ff;
+  transform: scale(1.02);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 420px;
+  max-width: 90%;
+  background: white;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+}
+
+.calendar-filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
