@@ -4,6 +4,7 @@ import api from "../services/api";
 
 function Calendar() {
   const [events, setEvents] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [courses, setCourses] = useState([]);
 
   const [title, setTitle] = useState("");
@@ -44,6 +45,22 @@ function Calendar() {
     }
   };
 
+  const fetchTasks = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.get("/tasks", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setTasks(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
   const fetchCourses = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -62,14 +79,15 @@ function Calendar() {
 
   useEffect(() => {
     fetchEvents();
+    fetchTasks();
     fetchCourses();
   }, []);
 
   const handleCreateEvent = async (e) => {
     e.preventDefault();
 
-    if (!title || !date) {
-      alert("Please fill in title and date");
+    if (!title || !date || !time || !course) {
+      alert("Please fill in all fields");
       return;
     }
 
@@ -215,20 +233,60 @@ function Calendar() {
     return matchesSearch && matchesType && matchesCourse;
   });
 
-  const getEventsForDay = (day) => {
+  const filteredTaskDeadlines = tasks.filter((task) => {
+    if (!task.dueDate || task.completed) {
+      return false;
+    }
+
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesType = selectedType ? selectedType === "task" : true;
+
+    const matchesCourse = selectedCourse
+      ? task.course?._id === selectedCourse
+      : true;
+
+    return matchesSearch && matchesType && matchesCourse;
+  });
+
+  const getItemsForDay = (day) => {
     if (!day) {
       return [];
     }
 
-    return events.filter((event) => {
-      const eventDate = new Date(event.date);
+    const dayEvents = filteredEvents
+      .filter((event) => {
+        const eventDate = new Date(event.date);
 
-      return (
-        eventDate.getFullYear() === year &&
-        eventDate.getMonth() === month &&
-        eventDate.getDate() === day
-      );
-    });
+        return (
+          eventDate.getFullYear() === year &&
+          eventDate.getMonth() === month &&
+          eventDate.getDate() === day
+        );
+      })
+      .map((event) => ({
+        ...event,
+        itemType: "event",
+      }));
+
+    const dayTasks = filteredTaskDeadlines
+      .filter((task) => {
+        const taskDate = new Date(task.dueDate);
+
+        return (
+          taskDate.getFullYear() === year &&
+          taskDate.getMonth() === month &&
+          taskDate.getDate() === day
+        );
+      })
+      .map((task) => ({
+        ...task,
+        itemType: "task",
+      }));
+
+    return [...dayEvents, ...dayTasks];
   };
 
   const handleDayClick = (day) => {
@@ -236,8 +294,9 @@ function Calendar() {
       return;
     }
 
-    const clickedDate = new Date(year, month, day);
-    const formattedDate = clickedDate.toISOString().split("T")[0];
+    const formattedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(
+      day
+    ).padStart(2, "0")}`;
 
     setSelectedDate(formattedDate);
     setDate(formattedDate);
@@ -252,7 +311,7 @@ function Calendar() {
       <main className="page">
         <section className="page-header">
           <h1>Calendar</h1>
-          <p>Your upcoming lectures, exams and deadlines.</p>
+          <p>Your upcoming lectures, exams, deadlines and tasks.</p>
         </section>
 
         <section className="card">
@@ -283,10 +342,23 @@ function Calendar() {
                   <>
                     <span className="calendar-day-number">{day}</span>
 
-                    {getEventsForDay(day).map((event) => (
-                      <div key={event._id} className="calendar-event">
-                        {event.time && <span>{event.time} </span>}
-                        {event.title}
+                    {getItemsForDay(day).map((item) => (
+                      <div
+                        key={`${item.itemType}-${item._id}`}
+                        className={
+                          item.itemType === "task"
+                            ? "calendar-event calendar-task"
+                            : "calendar-event"
+                        }
+                      >
+                        {item.itemType === "task" ? (
+                          <>Task: {item.title}</>
+                        ) : (
+                          <>
+                            {item.time && <span>{item.time} </span>}
+                            {item.title}
+                          </>
+                        )}
                       </div>
                     ))}
                   </>
@@ -362,7 +434,7 @@ function Calendar() {
           <div className="calendar-filters">
             <input
               type="text"
-              placeholder="Search events..."
+              placeholder="Search calendar..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -378,6 +450,7 @@ function Calendar() {
               <option value="meeting">Meeting</option>
               <option value="study">Study</option>
               <option value="other">Other</option>
+              <option value="task">Task deadlines</option>
             </select>
 
             <select
