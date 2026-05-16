@@ -191,145 +191,181 @@ function Tasks() {
     <div>
       <Navbar user={true} />
 
-      <h1>Tasks</h1>
+      <main className="page">
+        <section className="page-header">
+          <h1>Tasks</h1>
+          <p>Track assignments, deadlines and study tasks.</p>
+        </section>
 
-      <h2>Create Task</h2>
+        <section className="card">
+          <h2>Create Task</h2>
 
-      <form onSubmit={handleCreateTask}>
-        <input
-          type="text"
-          placeholder="Task title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+          <form onSubmit={handleCreateTask} className="form">
+            <input
+              type="text"
+              placeholder="Task title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
 
-        <select value={course} onChange={(e) => setCourse(e.target.value)}>
-          <option value="">Select course</option>
+            <select value={course} onChange={(e) => setCourse(e.target.value)}>
+              <option value="">Select course</option>
 
-          {courses.map((courseItem) => (
-            <option key={courseItem._id} value={courseItem._id}>
-              {courseItem.name}
-            </option>
+              {courses.map((courseItem) => (
+                <option key={courseItem._id} value={courseItem._id}>
+                  {courseItem.name}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+
+            <button type="submit">Add Task</button>
+          </form>
+        </section>
+
+        <section className="card">
+          <h2>Your Tasks</h2>
+
+          <div className="calendar-filters">
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            <select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+            >
+              <option value="">All Courses</option>
+
+              {courses.map((courseItem) => (
+                <option key={courseItem._id} value={courseItem._id}>
+                  {courseItem.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option value="">All Statuses</option>
+              <option value="completed">Completed</option>
+              <option value="not-completed">Not completed</option>
+            </select>
+          </div>
+
+          {filteredTasks.map((task) => (
+            <div key={task._id} className="list-item">
+              {editingTaskId === task._id ? (
+                <div className="edit-form">
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                  />
+
+                  <select
+                    value={editCourse}
+                    onChange={(e) => setEditCourse(e.target.value)}
+                  >
+                    <option value="">Select course</option>
+
+                    {courses.map((courseItem) => (
+                      <option key={courseItem._id} value={courseItem._id}>
+                        {courseItem.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <input
+                    type="date"
+                    value={editDueDate}
+                    onChange={(e) => setEditDueDate(e.target.value)}
+                  />
+
+                  <div className="actions">
+                    <button onClick={() => handleEditTask(task._id)}>
+                      Save
+                    </button>
+
+                    <button
+                      className="secondary-button"
+                      onClick={() => setEditingTaskId(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <h3>{task.title}</h3>
+
+                    {task.course && (
+                      <p>
+                        Course: {task.course.name} ({task.course.code})
+                      </p>
+                    )}
+
+                    {task.dueDate && (
+                      <p>
+                        Due date:{" "}
+                        {new Date(task.dueDate).toLocaleDateString()}
+                      </p>
+                    )}
+
+                    <p>
+                      Status:{" "}
+                      <strong>
+                        {task.completed ? "Completed" : "Not completed"}
+                      </strong>
+                    </p>
+                  </div>
+
+                  <div className="actions">
+                    <button onClick={() => handleToggleCompleted(task._id)}>
+                      {task.completed
+                        ? "Mark as incomplete"
+                        : "Mark as completed"}
+                    </button>
+
+                    <button
+                      className="secondary-button"
+                      onClick={() => {
+                        setEditingTaskId(task._id);
+                        setEditTitle(task.title);
+                        setEditCourse(task.course?._id || "");
+                        setEditDueDate(
+                          task.dueDate
+                            ? new Date(task.dueDate).toISOString().split("T")[0]
+                            : ""
+                        );
+                      }}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => handleDeleteTask(task._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           ))}
-        </select>
-
-        <input
-          type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-        />
-
-        <button type="submit">Add Task</button>
-      </form>
-
-      <h2>Your Tasks</h2>
-
-      <input
-        type="text"
-        placeholder="Search tasks..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      <select
-        value={selectedCourse}
-        onChange={(e) => setSelectedCourse(e.target.value)}
-      >
-        <option value="">All Courses</option>
-
-        {courses.map((courseItem) => (
-          <option key={courseItem._id} value={courseItem._id}>
-            {courseItem.name}
-          </option>
-        ))}
-      </select>
-
-      <select
-        value={selectedStatus}
-        onChange={(e) => setSelectedStatus(e.target.value)}
-      >
-        <option value="">All Statuses</option>
-        <option value="completed">Completed</option>
-        <option value="not-completed">Not completed</option>
-      </select>
-
-      {filteredTasks.map((task) => (
-        <div key={task._id}>
-          {editingTaskId === task._id ? (
-            <>
-              <input
-                type="text"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-              />
-
-              <select
-                value={editCourse}
-                onChange={(e) => setEditCourse(e.target.value)}
-              >
-                <option value="">Select course</option>
-
-                {courses.map((courseItem) => (
-                  <option key={courseItem._id} value={courseItem._id}>
-                    {courseItem.name}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                type="date"
-                value={editDueDate}
-                onChange={(e) => setEditDueDate(e.target.value)}
-              />
-
-              <button onClick={() => handleEditTask(task._id)}>Save</button>
-
-              <button onClick={() => setEditingTaskId(null)}>Cancel</button>
-            </>
-          ) : (
-            <>
-              <h3>{task.title}</h3>
-
-              {task.course && (
-                <p>
-                  Course: {task.course.name} ({task.course.code})
-                </p>
-              )}
-
-              {task.dueDate && (
-                <p>
-                  Due date: {new Date(task.dueDate).toLocaleDateString()}
-                </p>
-              )}
-
-              <p>Status: {task.completed ? "Completed" : "Not completed"}</p>
-
-              <button onClick={() => handleToggleCompleted(task._id)}>
-                {task.completed ? "Mark as incomplete" : "Mark as completed"}
-              </button>
-
-              <button
-                onClick={() => {
-                  setEditingTaskId(task._id);
-                  setEditTitle(task.title);
-                  setEditCourse(task.course?._id || "");
-                  setEditDueDate(
-                    task.dueDate
-                      ? new Date(task.dueDate).toISOString().split("T")[0]
-                      : ""
-                  );
-                }}
-              >
-                Edit Task
-              </button>
-
-              <button onClick={() => handleDeleteTask(task._id)}>
-                Delete Task
-              </button>
-            </>
-          )}
-        </div>
-      ))}
+        </section>
+      </main>
     </div>
   );
 }

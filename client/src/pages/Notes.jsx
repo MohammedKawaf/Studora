@@ -154,107 +154,135 @@ function Notes() {
     <div>
       <Navbar user={true} />
 
-      <h1>Notes</h1>
+      <main className="page">
+        <section className="page-header">
+          <h1>Notes</h1>
+          <p>Create, edit and organize your course notes.</p>
+        </section>
 
-      <h2>Create Note</h2>
+        <section className="card">
+          <h2>Create Note</h2>
 
-      <form onSubmit={handleCreateNote}>
-        <input
-          type="text"
-          placeholder="Note title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+          <form onSubmit={handleCreateNote} className="form">
+            <input
+              type="text"
+              placeholder="Note title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
 
-        <textarea
-          placeholder="Write your note here..."
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+            <textarea
+              placeholder="Write your note here..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
 
-        <select value={course} onChange={(e) => setCourse(e.target.value)}>
-          <option value="">Select course</option>
+            <select value={course} onChange={(e) => setCourse(e.target.value)}>
+              <option value="">Select course</option>
 
-          {courses.map((courseItem) => (
-            <option key={courseItem._id} value={courseItem._id}>
-              {courseItem.name}
-            </option>
-          ))}
-        </select>
+              {courses.map((courseItem) => (
+                <option key={courseItem._id} value={courseItem._id}>
+                  {courseItem.name}
+                </option>
+              ))}
+            </select>
 
-        <button type="submit">Add Note</button>
-      </form>
+            <button type="submit">Add Note</button>
+          </form>
+        </section>
 
-      <h2>Your Notes</h2>
+        <section className="card">
+          <h2>Your Notes</h2>
 
-      <input
-        type="text"
-        placeholder="Search notes..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+          <div className="calendar-filters">
+            <input
+              type="text"
+              placeholder="Search notes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
 
-      <select
-        value={selectedCourse}
-        onChange={(e) => setSelectedCourse(e.target.value)}
-      >
-        <option value="">All Courses</option>
+            <select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+            >
+              <option value="">All Courses</option>
 
-        {courses.map((courseItem) => (
-          <option key={courseItem._id} value={courseItem._id}>
-            {courseItem.name}
-          </option>
-        ))}
-      </select>
+              {courses.map((courseItem) => (
+                <option key={courseItem._id} value={courseItem._id}>
+                  {courseItem.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      {filteredNotes.map((note) => (
-        <div key={note._id}>
-          {editingNoteId === note._id ? (
-            <>
-              <input
-                type="text"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-              />
+          {filteredNotes.map((note) => (
+            <div key={note._id} className="list-item">
+              {editingNoteId === note._id ? (
+                <div className="edit-form">
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                  />
 
-              <textarea
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-              />
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                  />
 
-              <button onClick={() => handleEditNote(note._id)}>Save</button>
+                  <div className="actions">
+                    <button onClick={() => handleEditNote(note._id)}>
+                      Save
+                    </button>
 
-              <button onClick={() => setEditingNoteId(null)}>Cancel</button>
-            </>
-          ) : (
-            <>
-              <h3>{note.title}</h3>
+                    <button
+                      className="secondary-button"
+                      onClick={() => setEditingNoteId(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <h3>{note.title}</h3>
 
-              <p>{note.content}</p>
+                    <p>{note.content}</p>
 
-              {note.course && (
-                <p>
-                  Course: {note.course.name} ({note.course.code})
-                </p>
+                    {note.course && (
+                      <p>
+                        Course: {note.course.name} ({note.course.code})
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="actions">
+                    <button
+                      className="secondary-button"
+                      onClick={() => {
+                        setEditingNoteId(note._id);
+                        setEditTitle(note.title);
+                        setEditContent(note.content);
+                      }}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => handleDeleteNote(note._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
               )}
-
-              <button
-                onClick={() => {
-                  setEditingNoteId(note._id);
-                  setEditTitle(note.title);
-                  setEditContent(note.content);
-                }}
-              >
-                Edit Note
-              </button>
-
-              <button onClick={() => handleDeleteNote(note._id)}>
-                Delete Note
-              </button>
-            </>
-          )}
-        </div>
-      ))}
+            </div>
+          ))}
+        </section>
+      </main>
     </div>
   );
 }
