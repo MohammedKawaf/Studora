@@ -220,3 +220,50 @@ button:hover {
   gap: 12px;
   align-items: center;
 }
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.calendar-header h2 {
+  margin: 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.calendar-weekdays {
+  margin-bottom: 10px;
+  text-align: center;
+  color: #4b5563;
+}
+
+.calendar-day {
+  min-height: 120px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+  background-color: #f9fafb;
+}
+
+.calendar-day-number {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #0b2341;
+}
+
+.calendar-event {
+  font-size: 13px;
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 5px 7px;
+  border-radius: 8px;
+  margin-bottom: 5px;
+}

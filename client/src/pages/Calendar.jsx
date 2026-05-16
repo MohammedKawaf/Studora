@@ -19,6 +19,8 @@ function Calendar() {
   const [editTime, setEditTime] = useState("");
   const [editCourse, setEditCourse] = useState("");
 
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
   const fetchEvents = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -155,6 +157,56 @@ function Calendar() {
     }
   };
 
+  const goToPreviousMonth = () => {
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
+    );
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
+    );
+  };
+
+  const monthName = currentMonth.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+
+  const firstDayOfMonth = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startDay = firstDayOfMonth.getDay();
+
+  const calendarDays = [];
+
+  for (let i = 0; i < startDay; i++) {
+    calendarDays.push(null);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    calendarDays.push(day);
+  }
+
+  const getEventsForDay = (day) => {
+    if (!day) {
+      return [];
+    }
+
+    return events.filter((event) => {
+      const eventDate = new Date(event.date);
+
+      return (
+        eventDate.getFullYear() === year &&
+        eventDate.getMonth() === month &&
+        eventDate.getDate() === day
+      );
+    });
+  };
+
   return (
     <div>
       <Navbar user={true} />
@@ -163,6 +215,43 @@ function Calendar() {
         <section className="page-header">
           <h1>Calendar</h1>
           <p>Your upcoming lectures, exams and deadlines.</p>
+        </section>
+
+        <section className="card">
+          <div className="calendar-header">
+            <button onClick={goToPreviousMonth}>Previous</button>
+            <h2>{monthName}</h2>
+            <button onClick={goToNextMonth}>Next</button>
+          </div>
+
+          <div className="calendar-grid calendar-weekdays">
+            <strong>Sun</strong>
+            <strong>Mon</strong>
+            <strong>Tue</strong>
+            <strong>Wed</strong>
+            <strong>Thu</strong>
+            <strong>Fri</strong>
+            <strong>Sat</strong>
+          </div>
+
+          <div className="calendar-grid">
+            {calendarDays.map((day, index) => (
+              <div key={index} className="calendar-day">
+                {day && (
+                  <>
+                    <span className="calendar-day-number">{day}</span>
+
+                    {getEventsForDay(day).map((event) => (
+                      <div key={event._id} className="calendar-event">
+                        {event.time && <span>{event.time} </span>}
+                        {event.title}
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="card">
