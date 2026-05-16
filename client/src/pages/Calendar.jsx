@@ -12,6 +12,13 @@ function Calendar() {
   const [time, setTime] = useState("");
   const [course, setCourse] = useState("");
 
+  const [editingEventId, setEditingEventId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editType, setEditType] = useState("other");
+  const [editDate, setEditDate] = useState("");
+  const [editTime, setEditTime] = useState("");
+  const [editCourse, setEditCourse] = useState("");
+
   const fetchEvents = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -89,6 +96,65 @@ function Calendar() {
     }
   };
 
+  const handleEditEvent = async (eventId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.put(
+        `/events/${eventId}`,
+        {
+          title: editTitle,
+          type: editType,
+          date: editDate,
+          time: editTime,
+          course: editCourse,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setEditingEventId(null);
+      setEditTitle("");
+      setEditType("other");
+      setEditDate("");
+      setEditTime("");
+      setEditCourse("");
+
+      fetchEvents();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not update event");
+    }
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this event?"
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.delete(`/events/${eventId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchEvents();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not delete event");
+    }
+  };
+
   return (
     <div>
       <Navbar user={true} />
@@ -150,21 +216,111 @@ function Calendar() {
 
           {events.map((event) => (
             <div key={event._id} className="list-item">
-              <div>
-                <h3>{event.title}</h3>
+              {editingEventId === event._id ? (
+                <div className="edit-form">
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                  />
 
-                <p>Type: {event.type}</p>
+                  <select
+                    value={editType}
+                    onChange={(e) => setEditType(e.target.value)}
+                  >
+                    <option value="exam">Exam</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="lecture">Lecture</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="study">Study</option>
+                    <option value="other">Other</option>
+                  </select>
 
-                <p>Date: {new Date(event.date).toLocaleDateString()}</p>
+                  <input
+                    type="date"
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
+                  />
 
-                {event.time && <p>Time: {event.time}</p>}
+                  <input
+                    type="time"
+                    value={editTime}
+                    onChange={(e) => setEditTime(e.target.value)}
+                  />
 
-                {event.course && (
-                  <p>
-                    Course: {event.course.name} ({event.course.code})
-                  </p>
-                )}
-              </div>
+                  <select
+                    value={editCourse}
+                    onChange={(e) => setEditCourse(e.target.value)}
+                  >
+                    <option value="">Select course</option>
+
+                    {courses.map((courseItem) => (
+                      <option key={courseItem._id} value={courseItem._id}>
+                        {courseItem.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="actions">
+                    <button onClick={() => handleEditEvent(event._id)}>
+                      Save
+                    </button>
+
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => setEditingEventId(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <h3>{event.title}</h3>
+
+                    <p>Type: {event.type}</p>
+
+                    <p>Date: {new Date(event.date).toLocaleDateString()}</p>
+
+                    {event.time && <p>Time: {event.time}</p>}
+
+                    {event.course && (
+                      <p>
+                        Course: {event.course.name} ({event.course.code})
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="actions">
+                    <button
+                      className="secondary-button"
+                      onClick={() => {
+                        setEditingEventId(event._id);
+                        setEditTitle(event.title);
+                        setEditType(event.type);
+                        setEditDate(
+                          event.date
+                            ? new Date(event.date).toISOString().split("T")[0]
+                            : ""
+                        );
+                        setEditTime(event.time || "");
+                        setEditCourse(event.course?._id || "");
+                      }}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => handleDeleteEvent(event._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </section>
