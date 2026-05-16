@@ -306,3 +306,29 @@ button:hover {
   background-color: #dcfce7;
   color: #166534;
 }
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.overview-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+}
+
+.overview-card h3 {
+  margin: 0 0 8px;
+  color: #111827;
+}
+
+.overview-card p {
+  font-size: 28px;
+  font-weight: 800;
+  color: #2563eb;
+  margin: 0;
+}
