@@ -17,6 +17,12 @@ function Grades() {
   const [selectedTerm, setSelectedTerm] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("");
 
+  const [editingGradeId, setEditingGradeId] = useState(null);
+  const [editGrade, setEditGrade] = useState("");
+  const [editCredits, setEditCredits] = useState("");
+  const [editYear, setEditYear] = useState("");
+  const [editTerm, setEditTerm] = useState("");
+
   const fetchGrades = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -66,6 +72,15 @@ function Grades() {
       (courseItem) => courseItem._id === course
     );
 
+    const existingGrade = grades.find(
+      (gradeItem) => gradeItem.course?._id === course
+    );
+
+    if (existingGrade) {
+        alert("This course already has a grade");
+        return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
@@ -96,6 +111,69 @@ function Grades() {
     } catch (error) {
       console.log(error.response?.data || error.message);
       alert("Could not create grade");
+    }
+  };
+
+  const handleDeleteGrade = async (gradeId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this grade?"
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.delete(`/grades/${gradeId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchGrades();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not delete grade");
+    }
+  };
+
+  const handleEditGrade = async (gradeId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const existingGrade = grades.find(
+        (gradeItem) => gradeItem._id === gradeId
+      );
+
+      await api.put(
+        `/grades/${gradeId}`,
+        {
+          title: existingGrade.title,
+          course: existingGrade.course?._id,
+          grade: editGrade,
+          credits: editCredits,
+          year: editYear,
+          term: editTerm,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setEditingGradeId(null);
+      setEditGrade("");
+      setEditCredits("");
+      setEditYear("");
+      setEditTerm("");
+
+      fetchGrades();
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      alert("Could not update grade");
     }
   };
 
@@ -230,23 +308,104 @@ function Grades() {
 
           {filteredGrades.map((gradeItem) => (
             <div key={gradeItem._id} className="list-item">
-              <div>
-                <h3>{gradeItem.title}</h3>
+              {editingGradeId === gradeItem._id ? (
+                <div className="edit-form">
+                  <select
+                    value={editGrade}
+                    onChange={(e) => setEditGrade(e.target.value)}
+                  >
+                    <option value="U">U</option>
+                    <option value="G">G</option>
+                    <option value="VG">VG</option>
+                    <option value="MVG">MVG</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
 
-                <p>Grade: {gradeItem.grade}</p>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={editCredits}
+                    onChange={(e) => setEditCredits(e.target.value)}
+                  />
 
-                <p>Credits: {gradeItem.credits} hp</p>
+                  <select
+                    value={editYear}
+                    onChange={(e) => setEditYear(e.target.value)}
+                  >
+                    <option value="1">Year 1</option>
+                    <option value="2">Year 2</option>
+                    <option value="3">Year 3</option>
+                    <option value="4">Year 4</option>
+                    <option value="5">Year 5</option>
+                  </select>
 
-                <p>
-                  Year {gradeItem.year}, Term {gradeItem.term}
-                </p>
+                  <select
+                    value={editTerm}
+                    onChange={(e) => setEditTerm(e.target.value)}
+                  >
+                    <option value="1">Term 1</option>
+                    <option value="2">Term 2</option>
+                  </select>
 
-                {gradeItem.course && (
-                  <p>
-                    Course: {gradeItem.course.name} ({gradeItem.course.code})
-                  </p>
-                )}
-              </div>
+                  <div className="actions">
+                    <button onClick={() => handleEditGrade(gradeItem._id)}>
+                      Save
+                    </button>
+
+                    <button
+                      className="secondary-button"
+                      onClick={() => setEditingGradeId(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <h3>{gradeItem.title}</h3>
+
+                    <p>Grade: {gradeItem.grade}</p>
+
+                    <p>Credits: {gradeItem.credits} hp</p>
+
+                    <p>
+                      Year {gradeItem.year}, Term {gradeItem.term}
+                    </p>
+
+                    {gradeItem.course && (
+                      <p>
+                        Course: {gradeItem.course.name} (
+                        {gradeItem.course.code})
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="actions">
+                    <button
+                      className="secondary-button"
+                      onClick={() => {
+                        setEditingGradeId(gradeItem._id);
+                        setEditGrade(gradeItem.grade);
+                        setEditCredits(gradeItem.credits);
+                        setEditYear(gradeItem.year);
+                        setEditTerm(gradeItem.term);
+                      }}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => handleDeleteGrade(gradeItem._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </section>
