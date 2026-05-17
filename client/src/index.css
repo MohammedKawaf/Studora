@@ -332,3 +332,101 @@ button:hover {
   color: #2563eb;
   margin: 0;
 }
+
+.theme-toggle {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1200;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+}
+
+body.dark-mode {
+  background-color: #07111f;
+  color: #e5e7eb;
+}
+
+body.dark-mode nav {
+  background-color: #020617;
+}
+
+body.dark-mode .page-header h1,
+body.dark-mode .card h2,
+body.dark-mode .list-item h3,
+body.dark-mode .overview-card h3,
+body.dark-mode label {
+  color: #f9fafb;
+}
+
+body.dark-mode .page-header p,
+body.dark-mode .list-item p {
+  color: #cbd5e1;
+}
+
+body.dark-mode .card,
+body.dark-mode .modal {
+  background-color: #0f172a;
+  border-color: #1e293b;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .list-item,
+body.dark-mode .overview-card,
+body.dark-mode .calendar-day,
+body.dark-mode .color-picker-row {
+  background-color: #111827;
+  border-color: #334155;
+}
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: #020617;
+  color: #f9fafb;
+  border-color: #334155;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #94a3b8;
+}
+
+body.dark-mode .calendar-weekdays {
+  color: #cbd5e1;
+}
+
+body.dark-mode .calendar-day-number {
+  color: #f9fafb;
+}
+
+body.dark-mode .calendar-day:hover {
+  background-color: #1e293b;
+}
+
+body.dark-mode .secondary-button {
+  background-color: #1e293b;
+  color: #f9fafb;
+  border-color: #334155;
+}
+
+body.dark-mode .secondary-button:hover {
+  background-color: #334155;
+}
+
+body.dark-mode .danger-button {
+  background-color: #450a0a;
+  color: #fecaca;
+  border-color: #7f1d1d;
+}
+
+body.dark-mode .danger-button:hover {
+  background-color: #7f1d1d;
+}
+
+body.dark-mode .overview-card p {
+  color: #60a5fa;
+}
+
+body.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
