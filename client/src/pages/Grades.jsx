@@ -12,6 +12,11 @@ function Grades() {
   const [year, setYear] = useState("");
   const [term, setTerm] = useState("");
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedTerm, setSelectedTerm] = useState("");
+  const [selectedGrade, setSelectedGrade] = useState("");
+
   const fetchGrades = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -57,7 +62,9 @@ function Grades() {
       return;
     }
 
-    const selectedCourse = courses.find((courseItem) => courseItem._id === course);
+    const selectedCourse = courses.find(
+      (courseItem) => courseItem._id === course
+    );
 
     try {
       const token = localStorage.getItem("token");
@@ -91,6 +98,26 @@ function Grades() {
       alert("Could not create grade");
     }
   };
+
+  const filteredGrades = grades.filter((gradeItem) => {
+    const matchesSearch = gradeItem.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesYear = selectedYear
+      ? gradeItem.year.toString() === selectedYear
+      : true;
+
+    const matchesTerm = selectedTerm
+      ? gradeItem.term.toString() === selectedTerm
+      : true;
+
+    const matchesGrade = selectedGrade
+      ? gradeItem.grade === selectedGrade
+      : true;
+
+    return matchesSearch && matchesYear && matchesTerm && matchesGrade;
+  });
 
   return (
     <div>
@@ -157,7 +184,51 @@ function Grades() {
         <section className="card">
           <h2>Your Grades</h2>
 
-          {grades.map((gradeItem) => (
+          <div className="calendar-filters">
+            <input
+              type="text"
+              placeholder="Search grades..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+            >
+              <option value="">All Years</option>
+              <option value="1">Year 1</option>
+              <option value="2">Year 2</option>
+              <option value="3">Year 3</option>
+              <option value="4">Year 4</option>
+              <option value="5">Year 5</option>
+            </select>
+
+            <select
+              value={selectedTerm}
+              onChange={(e) => setSelectedTerm(e.target.value)}
+            >
+              <option value="">All Terms</option>
+              <option value="1">Term 1</option>
+              <option value="2">Term 2</option>
+            </select>
+
+            <select
+              value={selectedGrade}
+              onChange={(e) => setSelectedGrade(e.target.value)}
+            >
+              <option value="">All Grades</option>
+              <option value="U">U</option>
+              <option value="G">G</option>
+              <option value="VG">VG</option>
+              <option value="MVG">MVG</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+
+          {filteredGrades.map((gradeItem) => (
             <div key={gradeItem._id} className="list-item">
               <div>
                 <h3>{gradeItem.title}</h3>
