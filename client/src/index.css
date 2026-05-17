@@ -430,3 +430,59 @@ body.dark-mode .overview-card p {
 body.dark-mode .modal-overlay {
   background: rgba(0, 0, 0, 0.7);
 }
+
+.reminder-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.reminder-card {
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.reminder-card h3 {
+  margin: 0 0 8px;
+}
+
+.reminder-card p {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.overdue-reminder {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.soon-reminder {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.today-reminder {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+body.dark-mode .overdue-reminder {
+  background-color: #450a0a;
+  color: #fecaca;
+  border-color: #7f1d1d;
+}
+
+body.dark-mode .soon-reminder {
+  background-color: #451a03;
+  color: #fde68a;
+  border-color: #92400e;
+}
+
+body.dark-mode .today-reminder {
+  background-color: #172554;
+  color: #bfdbfe;
+  border-color: #1d4ed8;
+}

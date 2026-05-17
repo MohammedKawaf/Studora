@@ -98,13 +98,52 @@ function Home() {
     fetchEvents();
   }, []);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const threeDaysFromNow = new Date(today);
+  threeDaysFromNow.setDate(today.getDate() + 3);
+
+  const overdueTasks = tasks
+    .filter((task) => {
+      if (!task.dueDate || task.completed) {
+        return false;
+      }
+
+      return new Date(task.dueDate) < today;
+    })
+    .slice(0, 5);
+
+  const dueSoonTasks = tasks
+    .filter((task) => {
+      if (!task.dueDate || task.completed) {
+        return false;
+      }
+
+      const dueDate = new Date(task.dueDate);
+
+      return dueDate >= today && dueDate <= threeDaysFromNow;
+    })
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+    .slice(0, 5);
+
+  const todaysEvents = events
+    .filter((event) => {
+      const eventDate = new Date(event.date);
+      eventDate.setHours(0, 0, 0, 0);
+
+      return eventDate.getTime() === today.getTime();
+    })
+    .sort((a, b) => (a.time || "").localeCompare(b.time || ""))
+    .slice(0, 5);
+
   const upcomingDeadlines = tasks
     .filter((task) => task.dueDate && !task.completed)
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
     .slice(0, 5);
 
   const upcomingEvents = events
-    .filter((event) => new Date(event.date) >= new Date().setHours(0, 0, 0, 0))
+    .filter((event) => new Date(event.date) >= today)
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .slice(0, 5);
 
@@ -144,6 +183,95 @@ function Home() {
             </div>
           </div>
         </section>
+
+        <section className="card">
+          <h2>Smart Reminders</h2>
+
+          <div className="reminder-grid">
+            <div className="reminder-card overdue-reminder">
+              <h3>Overdue Tasks</h3>
+              <p>{overdueTasks.length}</p>
+            </div>
+
+            <div className="reminder-card soon-reminder">
+              <h3>Due Soon</h3>
+              <p>{dueSoonTasks.length}</p>
+            </div>
+
+            <div className="reminder-card today-reminder">
+              <h3>Today's Events</h3>
+              <p>{todaysEvents.length}</p>
+            </div>
+          </div>
+        </section>
+
+        {overdueTasks.length > 0 && (
+          <section className="card">
+            <h2>Overdue Tasks</h2>
+
+            {overdueTasks.map((task) => (
+              <div key={task._id} className="list-item">
+                <div>
+                  <h3>{task.title}</h3>
+
+                  {task.course && (
+                    <p>
+                      Course: {task.course.name} ({task.course.code})
+                    </p>
+                  )}
+
+                  <p>Due date: {new Date(task.dueDate).toLocaleDateString()}</p>
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {dueSoonTasks.length > 0 && (
+          <section className="card">
+            <h2>Due Soon</h2>
+
+            {dueSoonTasks.map((task) => (
+              <div key={task._id} className="list-item">
+                <div>
+                  <h3>{task.title}</h3>
+
+                  {task.course && (
+                    <p>
+                      Course: {task.course.name} ({task.course.code})
+                    </p>
+                  )}
+
+                  <p>Due date: {new Date(task.dueDate).toLocaleDateString()}</p>
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {todaysEvents.length > 0 && (
+          <section className="card">
+            <h2>Today's Events</h2>
+
+            {todaysEvents.map((event) => (
+              <div key={event._id} className="list-item">
+                <div>
+                  <h3>{event.title}</h3>
+
+                  <p>Type: {event.type}</p>
+
+                  {event.time && <p>Time: {event.time}</p>}
+
+                  {event.course && (
+                    <p>
+                      Course: {event.course.name} ({event.course.code})
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
 
         <section className="card">
           <h2>Upcoming Deadlines</h2>
