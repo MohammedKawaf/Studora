@@ -28,9 +28,15 @@ function Profile() {
   }, []);
 
   const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to log out?");
+
+    if (!confirmLogout) {
+        return;
+    }
+
     localStorage.removeItem("token");
     navigate("/login");
-  };
+    };
 
   const handleProfilePicture = () => {
     alert("Profile picture upload will be added later.");
@@ -41,8 +47,16 @@ function Profile() {
   };
 
   const handleDeleteAccount = () => {
-    alert("Delete account will be added later.");
-  };
+    const confirmDelete = window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    alert("Delete account with email and password confirmation will be added later.");
+    };
 
   return (
     <div>
