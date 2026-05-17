@@ -486,3 +486,79 @@ body.dark-mode .today-reminder {
   color: #bfdbfe;
   border-color: #1d4ed8;
 }
+
+.profile-info {
+  display: grid;
+  gap: 18px;
+}
+
+.profile-item {
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background-color: #f9fafb;
+}
+
+.profile-item h3 {
+  margin: 0 0 8px;
+}
+
+.profile-item p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.profile-features {
+  display: grid;
+  gap: 10px;
+}
+
+.profile-features p {
+  margin: 0;
+}
+
+body.dark-mode .profile-item {
+  background-color: #111827;
+  border-color: #334155;
+}
+
+body.dark-mode .profile-item p,
+body.dark-mode .profile-features p {
+  color: #cbd5e1;
+}
+
+.profile-card {
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #38bdf8, #7c3aed);
+  color: white;
+  font-size: 48px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.profile-card h2 {
+  margin-bottom: 6px;
+}
+
+.profile-card p {
+  color: #6b7280;
+  margin-bottom: 18px;
+}
+
+.profile-actions {
+  display: grid;
+  gap: 12px;
+}
+
+body.dark-mode .profile-card p {
+  color: #cbd5e1;
+}

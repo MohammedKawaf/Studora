@@ -17,6 +17,7 @@ function Navbar({ user }) {
           <Link to="/notes">Notes</Link>{" "}
           <Link to="/tasks">Tasks</Link>{" "}
           <Link to="/calendar">Calendar</Link>{" "}
+          <Link to="/profile">Profile</Link>{" "}
         </>
       )}
 
