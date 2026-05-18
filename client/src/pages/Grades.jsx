@@ -77,8 +77,8 @@ function Grades() {
     );
 
     if (existingGrade) {
-        alert("This course already has a grade");
-        return;
+      alert("This course already has a grade");
+      return;
     }
 
     try {
@@ -177,6 +177,81 @@ function Grades() {
     }
   };
 
+  const passedGrades = grades.filter((gradeItem) => gradeItem.grade !== "U");
+
+  const failedGrades = grades.filter((gradeItem) => gradeItem.grade === "U");
+
+  const totalCredits = passedGrades.reduce(
+    (total, gradeItem) => total + Number(gradeItem.credits),
+    0
+  );
+
+  const totalCourses = grades.length;
+
+  const hasNumericGrades = grades.some((gradeItem) =>
+    ["3", "4", "5"].includes(gradeItem.grade)
+  );
+
+  const averageGrade = (() => {
+    if (hasNumericGrades) {
+      const numericGrades = grades
+        .map((gradeItem) => {
+          switch (gradeItem.grade) {
+            case "5":
+              return 5;
+            case "4":
+              return 4;
+            case "3":
+              return 3;
+            default:
+              return null;
+          }
+        })
+        .filter((gradeValue) => gradeValue !== null);
+
+      if (numericGrades.length === 0) {
+        return "N/A";
+      }
+
+      const average =
+        numericGrades.reduce((a, b) => a + b, 0) / numericGrades.length;
+
+      return average.toFixed(1);
+    }
+
+    const letterGrades = grades
+      .map((gradeItem) => {
+        switch (gradeItem.grade) {
+          case "MVG":
+            return 5;
+          case "VG":
+            return 4;
+          case "G":
+            return 3;
+          default:
+            return null;
+        }
+      })
+      .filter((gradeValue) => gradeValue !== null);
+
+    if (letterGrades.length === 0) {
+      return "N/A";
+    }
+
+    const average =
+      letterGrades.reduce((a, b) => a + b, 0) / letterGrades.length;
+
+    if (average >= 4.5) {
+      return "MVG";
+    }
+
+    if (average >= 3.5) {
+      return "VG";
+    }
+
+    return "G";
+  })();
+
   const filteredGrades = grades.filter((gradeItem) => {
     const matchesSearch = gradeItem.title
       .toLowerCase()
@@ -205,6 +280,33 @@ function Grades() {
         <section className="page-header">
           <h1>Grades</h1>
           <p>Track your grades, credits and study progress.</p>
+        </section>
+
+        <section className="overview-grid">
+          <div className="overview-card">
+            <h3>Total Credits</h3>
+            <p>{totalCredits} hp</p>
+          </div>
+
+          <div className="overview-card">
+            <h3>Passed Courses</h3>
+            <p>{passedGrades.length}</p>
+          </div>
+
+          <div className="overview-card">
+            <h3>Failed Courses</h3>
+            <p>{failedGrades.length}</p>
+          </div>
+
+          <div className="overview-card">
+            <h3>{hasNumericGrades ? "Average Score" : "Average Grade"}</h3>
+            <p>{averageGrade}</p>
+          </div>
+
+          <div className="overview-card">
+            <h3>Total Courses</h3>
+            <p>{totalCourses}</p>
+          </div>
         </section>
 
         <section className="card">
