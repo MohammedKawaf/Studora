@@ -28,8 +28,6 @@ function Navbar({ user }) {
           <Link to="/register">Register</Link>{" "}
         </>
       )}
-
-      {user && <button onClick={handleLogout}>Logout</button>}
     </nav>
   );
 }

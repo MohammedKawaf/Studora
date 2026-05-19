@@ -200,73 +200,79 @@ function Courses() {
             />
           </div>
 
-          {filteredCourses.map((course) => (
-            <div key={course._id} className="list-item">
-              {editingCourseId === course._id ? (
-                <div className="edit-form">
-                  <input
-                    type="text"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                  />
+          {filteredCourses.length === 0 ? (
+            <p>No courses found.</p>
+          ) : (
+            filteredCourses.map((course) => (
+              <div key={course._id} className="list-item">
+                {editingCourseId === course._id ? (
+                  <div className="edit-form">
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                    />
 
-                  <input
-                    type="text"
-                    value={editCode}
-                    onChange={(e) => setEditCode(e.target.value)}
-                  />
+                    <input
+                      type="text"
+                      value={editCode}
+                      onChange={(e) => setEditCode(e.target.value)}
+                    />
 
-                  <div className="actions">
-                    <button onClick={() => handleEditCourse(course._id)}>
-                      Save
-                    </button>
+                    <div className="actions">
+                      <button onClick={() => handleEditCourse(course._id)}>
+                        Save
+                      </button>
 
-                    <button
-                      type="button"
-                      className="secondary-button"
-                      onClick={() => setEditingCourseId(null)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="course-info">
-                    <div
-                      className="course-color"
-                      style={{ backgroundColor: course.color }}
-                    ></div>
-
-                    <div>
-                      <h3>{course.name}</h3>
-                      <p>{course.code}</p>
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={() => setEditingCourseId(null)}
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
+                ) : (
+                  <>
+                    <div className="course-info">
+                      <div
+                        className="course-color"
+                        style={{ backgroundColor: course.color }}
+                      ></div>
 
-                  <div className="actions">
-                    <button
-                      className="secondary-button"
-                      onClick={() => {
-                        setEditingCourseId(course._id);
-                        setEditName(course.name);
-                        setEditCode(course.code);
-                      }}
-                    >
-                      Edit
-                    </button>
+                      <div>
+                        <h3>{course.name}</h3>
+                        <p>{course.code}</p>
+                      </div>
+                    </div>
 
-                    <button
-                      className="danger-button"
-                      onClick={() => handleDeleteCourse(course._id, course.name)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                    <div className="actions">
+                      <button
+                        className="secondary-button"
+                        onClick={() => {
+                          setEditingCourseId(course._id);
+                          setEditName(course.name);
+                          setEditCode(course.code);
+                        }}
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        className="danger-button"
+                        onClick={() =>
+                          handleDeleteCourse(course._id, course.name)
+                        }
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))
+          )}
         </section>
       </main>
     </div>

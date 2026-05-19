@@ -216,71 +216,75 @@ function Notes() {
             </select>
           </div>
 
-          {filteredNotes.map((note) => (
-            <div key={note._id} className="list-item">
-              {editingNoteId === note._id ? (
-                <div className="edit-form">
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                  />
+          {filteredNotes.length === 0 ? (
+            <p>No notes found.</p>
+          ) : (
+            filteredNotes.map((note) => (
+              <div key={note._id} className="list-item">
+                {editingNoteId === note._id ? (
+                  <div className="edit-form">
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                    />
 
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                  />
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                    />
 
-                  <div className="actions">
-                    <button onClick={() => handleEditNote(note._id)}>
-                      Save
-                    </button>
+                    <div className="actions">
+                      <button onClick={() => handleEditNote(note._id)}>
+                        Save
+                      </button>
 
-                    <button
-                      className="secondary-button"
-                      onClick={() => setEditingNoteId(null)}
-                    >
-                      Cancel
-                    </button>
+                      <button
+                        className="secondary-button"
+                        onClick={() => setEditingNoteId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <h3>{note.title}</h3>
+                ) : (
+                  <>
+                    <div>
+                      <h3>{note.title}</h3>
 
-                    <p>{note.content}</p>
+                      <p>{note.content}</p>
 
-                    {note.course && (
-                      <p>
-                        Course: {note.course.name} ({note.course.code})
-                      </p>
-                    )}
-                  </div>
+                      {note.course && (
+                        <p>
+                          Course: {note.course.name} ({note.course.code})
+                        </p>
+                      )}
+                    </div>
 
-                  <div className="actions">
-                    <button
-                      className="secondary-button"
-                      onClick={() => {
-                        setEditingNoteId(note._id);
-                        setEditTitle(note.title);
-                        setEditContent(note.content);
-                      }}
-                    >
-                      Edit
-                    </button>
+                    <div className="actions">
+                      <button
+                        className="secondary-button"
+                        onClick={() => {
+                          setEditingNoteId(note._id);
+                          setEditTitle(note.title);
+                          setEditContent(note.content);
+                        }}
+                      >
+                        Edit
+                      </button>
 
-                    <button
-                      className="danger-button"
-                      onClick={() => handleDeleteNote(note._id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                      <button
+                        className="danger-button"
+                        onClick={() => handleDeleteNote(note._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))
+          )}
         </section>
       </main>
     </div>
