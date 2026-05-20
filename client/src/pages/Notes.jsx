@@ -57,14 +57,19 @@ function Notes() {
   const handleCreateNote = async (e) => {
     e.preventDefault();
 
+    if (!title.trim() || !content.trim() || !course) {
+      alert("Please fill in title, content and course");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
       await api.post(
         "/notes",
         {
-          title,
-          content,
+          title: title.trim(),
+          content: content.trim(),
           course,
         },
         {

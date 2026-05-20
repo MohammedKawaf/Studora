@@ -63,6 +63,11 @@ function Grades() {
   const handleCreateGrade = async (e) => {
     e.preventDefault();
 
+    if (Number(credits) <= 0) {
+      alert("Credits must be greater than 0");
+      return;
+    }
+
     if (!course || !grade || !credits || !year || !term) {
       alert("Please fill in all fields");
       return;

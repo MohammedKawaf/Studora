@@ -55,12 +55,28 @@ function Courses() {
   const handleCreateCourse = async (e) => {
     e.preventDefault();
 
+    if (!name.trim() || !code.trim()) {
+      alert("Please enter a course name and course code");
+      return;
+    }
+
+    const duplicateCourse = courses.find(
+      (course) =>
+        course.name.toLowerCase() === name.trim().toLowerCase() ||
+        course.code.toLowerCase() === code.trim().toLowerCase()
+    );
+
+    if (duplicateCourse) {
+      alert("A course with this name or code already exists");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
       await api.post(
         "/courses",
-        { name, code, color },
+        { name: name.trim(), code: code.trim(), color },
         {
           headers: {
             Authorization: `Bearer ${token}`,

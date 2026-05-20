@@ -59,8 +59,17 @@ function Tasks() {
   const handleCreateTask = async (e) => {
     e.preventDefault();
 
-    if (!title || !course || !dueDate) {
+    if (!title.trim() || !course || !dueDate) {
       alert("Please fill in all fields");
+      return;
+    }
+
+    const selectedDueDate = new Date(dueDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDueDate < today) {
+      alert("Due date cannot be in the past");
       return;
     }
 
@@ -70,7 +79,7 @@ function Tasks() {
       await api.post(
         "/tasks",
         {
-          title,
+          title: title.trim(),
           course,
           dueDate,
         },
