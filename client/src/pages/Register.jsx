@@ -7,60 +7,98 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setErrorMessage("");
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setSuccessMessage("");
+
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 3000);
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    if (!username.trim() || !email.trim() || !password.trim()) {
+      showErrorMessage("Please fill in all fields");
+      return;
+    }
+
     try {
       await api.post("/auth/register", {
-        username,
-        email,
-        password,
+        username: username.trim(),
+        email: email.trim(),
+        password: password.trim(),
       });
 
-      alert("Account created successfully!");
+      showSuccessMessage("Account created successfully!");
 
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (error) {
       console.log(error.response?.data || error.message);
 
-      alert("Registration failed");
+      showErrorMessage("Registration failed");
     }
   };
 
   return (
-    <div>
+    <div className="auth-page">
       <nav>
         <Link to="/login">Login</Link>
       </nav>
 
-      <h1>Create account</h1>
+      <main className="auth-container">
+        <h1>Create account</h1>
 
-      <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+        {successMessage && (
+          <div className="success-banner">{successMessage}</div>
+        )}
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        {errorMessage && (
+          <div className="error-banner">{errorMessage}</div>
+        )}
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <form onSubmit={handleRegister} className="form">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
 
-        <button type="submit">Register</button>
-      </form>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button type="submit">Register</button>
+        </form>
+      </main>
     </div>
   );
 }
