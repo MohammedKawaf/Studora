@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import NotificationBanner from "../components/NotificationBanner";
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -113,11 +114,10 @@ function Profile() {
           <p>Your Studora account settings and information.</p>
         </section>
 
-        {successMessage && (
-          <div className="success-banner">{successMessage}</div>
-        )}
-
-        {errorMessage && <div className="error-banner">{errorMessage}</div>}
+        <NotificationBanner
+          successMessage={successMessage}
+          errorMessage={errorMessage}
+        />
 
         {user && (
           <section className="card profile-card">

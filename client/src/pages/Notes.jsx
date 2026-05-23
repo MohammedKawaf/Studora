@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import NotificationBanner from "../components/NotificationBanner";
 
 function Notes() {
   const [notes, setNotes] = useState([]);
@@ -194,12 +195,11 @@ function Notes() {
           <p>Create, edit and organize your course notes.</p>
         </section>
 
-        {successMessage && (
-          <div className="success-banner">{successMessage}</div>
-        )}
-
-        {errorMessage && <div className="error-banner">{errorMessage}</div>}
-
+        <NotificationBanner
+          successMessage={successMessage}
+          errorMessage={errorMessage}
+        />
+        
         <section className="card">
           <h2>Create Note</h2>
 

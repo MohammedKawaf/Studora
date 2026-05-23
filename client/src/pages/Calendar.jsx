@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import NotificationBanner from "../components/NotificationBanner";
 
 function Calendar() {
   const [events, setEvents] = useState([]);
@@ -341,12 +342,11 @@ function Calendar() {
           <p>Your upcoming lectures, exams, deadlines and tasks.</p>
         </section>
 
-        {successMessage && (
-          <div className="success-banner">{successMessage}</div>
-        )}
-
-        {errorMessage && <div className="error-banner">{errorMessage}</div>}
-
+        <NotificationBanner
+          successMessage={successMessage}
+          errorMessage={errorMessage}
+        />
+        
         <section className="card">
           <div className="calendar-header">
             <button onClick={goToPreviousMonth}>Previous</button>

@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import NotificationBanner from "../components/NotificationBanner";
 
 function Grades() {
   const [grades, setGrades] = useState([]);
@@ -306,11 +307,10 @@ function Grades() {
           <p>Track your grades, credits and study progress.</p>
         </section>
 
-        {successMessage && (
-          <div className="success-banner">{successMessage}</div>
-        )}
-
-        {errorMessage && <div className="error-banner">{errorMessage}</div>}
+        <NotificationBanner
+          successMessage={successMessage}
+          errorMessage={errorMessage}
+        />
 
         <section className="overview-grid">
           <div className="overview-card">

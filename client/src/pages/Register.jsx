@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import NotificationBanner from "../components/NotificationBanner";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -66,13 +67,10 @@ function Register() {
       <main className="auth-container">
         <h1>Create account</h1>
 
-        {successMessage && (
-          <div className="success-banner">{successMessage}</div>
-        )}
-
-        {errorMessage && (
-          <div className="error-banner">{errorMessage}</div>
-        )}
+        <NotificationBanner
+          successMessage={successMessage}
+          errorMessage={errorMessage}
+        />
 
         <form onSubmit={handleRegister} className="form">
           <input

@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import NotificationBanner from "../components/NotificationBanner";
 
 function Tasks() {
   const [tasks, setTasks] = useState([]);
@@ -241,11 +242,10 @@ function Tasks() {
           <p>Track assignments, deadlines and study tasks.</p>
         </section>
 
-        {successMessage && (
-          <div className="success-banner">{successMessage}</div>
-        )}
-
-        {errorMessage && <div className="error-banner">{errorMessage}</div>}
+        <NotificationBanner
+          successMessage={successMessage}
+          errorMessage={errorMessage}
+        />
 
         <section className="card">
           <h2>Create Task</h2>
