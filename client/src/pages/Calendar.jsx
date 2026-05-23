@@ -378,11 +378,21 @@ function Calendar() {
                     {getItemsForDay(day).map((item) => (
                       <div
                         key={`${item.itemType}-${item._id}`}
-                        className={
+                        className={`calendar-event ${
                           item.itemType === "task"
-                            ? "calendar-event calendar-task"
-                            : "calendar-event"
-                        }
+                            ? "calendar-task"
+                            : item.type === "exam"
+                            ? "calendar-exam"
+                            : item.type === "assignment"
+                            ? "calendar-assignment"
+                            : item.type === "lecture"
+                            ? "calendar-lecture"
+                            : item.type === "meeting"
+                            ? "calendar-meeting"
+                            : item.type === "study"
+                            ? "calendar-study"
+                            : "calendar-other"
+                        }`}
                       >
                         {item.itemType === "task" ? (
                           <>Task: {item.title}</>
