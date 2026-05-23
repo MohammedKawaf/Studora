@@ -256,7 +256,10 @@ function Courses() {
           </div>
 
           {filteredCourses.length === 0 ? (
-            <p>No courses found.</p>
+            <div className="empty-state">
+              <h3>📚 No courses yet</h3>
+              <p>Create your first course to start organizing your studies.</p>
+            </div>
           ) : (
             filteredCourses.map((course) => (
               <div key={course._id} className="list-item">

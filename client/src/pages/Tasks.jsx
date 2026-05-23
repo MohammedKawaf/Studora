@@ -313,7 +313,10 @@ function Tasks() {
           </div>
 
           {filteredTasks.length === 0 ? (
-            <p>No tasks found.</p>
+            <div className="empty-state">
+              <h3>📋 No tasks yet</h3>
+              <p>Add tasks and deadlines to stay organized.</p>
+            </div>
           ) : (
             filteredTasks.map((task) => (
               <div key={task._id} className="list-item">

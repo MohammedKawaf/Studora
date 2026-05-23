@@ -501,7 +501,10 @@ function Calendar() {
           </div>
 
           {filteredEvents.length === 0 ? (
-            <p>No events found.</p>
+            <div className="empty-state">
+              <h3>📅 No events yet</h3>
+              <p>Create calendar events and manage your schedule.</p>
+            </div>
           ) : (
             filteredEvents.map((event) => (
               <div key={event._id} className="list-item">

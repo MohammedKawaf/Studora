@@ -257,7 +257,10 @@ function Notes() {
           </div>
 
           {filteredNotes.length === 0 ? (
-            <p>No notes found.</p>
+            <div className="empty-state">
+              <h3>📝 No notes yet</h3>
+              <p>Create notes for your courses and study material.</p>
+            </div>
           ) : (
             filteredNotes.map((note) => (
               <div key={note._id} className="list-item">

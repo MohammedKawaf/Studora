@@ -431,7 +431,10 @@ function Grades() {
           </div>
 
           {filteredGrades.length === 0 ? (
-            <p>No grades found.</p>
+            <div className="empty-state">
+              <h3>📈 No grades yet</h3>
+              <p>Add your grades to track your study progress.</p>
+            </div>
           ) : (
             filteredGrades.map((gradeItem) => (
               <div key={gradeItem._id} className="list-item">
