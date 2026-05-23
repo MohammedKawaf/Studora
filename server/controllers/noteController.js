@@ -23,7 +23,7 @@ const getNotes = async (req, res) => {
   try {
     const notes = await Note.find({
       user: req.user._id,
-    }).populate("course", "name code");
+    }).populate("course", "name code color");
 
     res.status(200).json(notes);
   } catch (error) {

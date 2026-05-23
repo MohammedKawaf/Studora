@@ -298,9 +298,16 @@ function Notes() {
                       <p>{note.content}</p>
 
                       {note.course && (
-                        <p>
-                          Course: {note.course.name} ({note.course.code})
-                        </p>
+                        <div className="course-badge">
+                          <span
+                            className="course-badge-color"
+                            style={{ backgroundColor: note.course.color }}
+                          ></span>
+
+                          <span>
+                            {note.course.name} ({note.course.code})
+                          </span>
+                        </div>
                       )}
                     </div>
 
