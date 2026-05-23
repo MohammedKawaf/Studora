@@ -366,9 +366,16 @@ function Tasks() {
                       <h3>{task.title}</h3>
 
                       {task.course && (
-                        <p>
-                          Course: {task.course.name} ({task.course.code})
-                        </p>
+                        <div className="course-badge">
+                          <span
+                            className="course-badge-color"
+                            style={{ backgroundColor: task.course.color }}
+                          ></span>
+
+                          <span>
+                            {task.course.name} ({task.course.code})
+                          </span>
+                        </div>
                       )}
 
                       {task.dueDate && (

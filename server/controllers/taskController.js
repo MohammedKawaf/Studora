@@ -23,7 +23,7 @@ const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({
       user: req.user._id,
-    }).populate("course", "name code");
+    }).populate("course", "name code color");
 
     res.status(200).json(tasks);
   } catch (error) {
