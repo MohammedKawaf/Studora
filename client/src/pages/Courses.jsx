@@ -15,6 +15,27 @@ function Courses() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setErrorMessage("");
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setSuccessMessage("");
+
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 3000);
+  };
+
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -56,7 +77,7 @@ function Courses() {
     e.preventDefault();
 
     if (!name.trim() || !code.trim()) {
-      alert("Please enter a course name and course code");
+      showErrorMessage("Please enter a course name and course code");
       return;
     }
 
@@ -67,7 +88,7 @@ function Courses() {
     );
 
     if (duplicateCourse) {
-      alert("A course with this name or code already exists");
+      showErrorMessage("A course with this name or code already exists");
       return;
     }
 
@@ -76,7 +97,11 @@ function Courses() {
 
       await api.post(
         "/courses",
-        { name: name.trim(), code: code.trim(), color },
+        {
+          name: name.trim(),
+          code: code.trim(),
+          color,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,9 +114,10 @@ function Courses() {
       setColor("#2563eb");
 
       fetchCourses();
+      showSuccessMessage("Course created successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not create course");
+      showErrorMessage("Could not create course");
     }
   };
 
@@ -114,21 +140,27 @@ function Courses() {
       });
 
       fetchCourses();
+      showSuccessMessage("Course deleted successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not delete course");
+      showErrorMessage("Could not delete course");
     }
   };
 
   const handleEditCourse = async (courseId) => {
+    if (!editName.trim() || !editCode.trim()) {
+      showErrorMessage("Please enter a course name and course code");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
       await api.put(
         `/courses/${courseId}`,
         {
-          name: editName,
-          code: editCode,
+          name: editName.trim(),
+          code: editCode.trim(),
         },
         {
           headers: {
@@ -142,9 +174,10 @@ function Courses() {
       setEditCode("");
 
       fetchCourses();
+      showSuccessMessage("Course updated successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not update course");
+      showErrorMessage("Could not update course");
     }
   };
 
@@ -165,6 +198,12 @@ function Courses() {
           <h1>Courses</h1>
           {user && <p>Welcome, {user.username}</p>}
         </section>
+
+        {successMessage && (
+          <div className="success-banner">{successMessage}</div>
+        )}
+
+        {errorMessage && <div className="error-banner">{errorMessage}</div>}
 
         <section className="card">
           <h2>Create Course</h2>

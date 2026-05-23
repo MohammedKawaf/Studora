@@ -562,3 +562,29 @@ body.dark-mode .profile-features p {
 body.dark-mode .profile-card p {
   color: #cbd5e1;
 }
+
+.success-banner {
+  margin-bottom: 24px;
+  padding: 18px 22px;
+  border-radius: 16px;
+  background: linear-gradient(
+    90deg,
+    rgba(34, 197, 94, 0.2),
+    rgba(59, 130, 246, 0.15)
+  );
+  border: 1px solid #22c55e;
+  color: #dcfce7;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.error-banner {
+  margin-bottom: 24px;
+  padding: 18px 22px;
+  border-radius: 16px;
+  background: rgba(220, 38, 38, 0.15);
+  border: 1px solid #dc2626;
+  color: #fecaca;
+  font-size: 18px;
+  font-weight: 700;
+}
