@@ -317,7 +317,7 @@ function Grades() {
             <h3>Total Credits</h3>
             <p>{totalCredits} / {creditGoal} hp</p>
           </div>
-          
+
           <div className="overview-card">
             <h3>Passed Courses</h3>
             <p>{passedGrades.length}</p>
@@ -511,10 +511,16 @@ function Grades() {
                       </p>
 
                       {gradeItem.course && (
-                        <p>
-                          Course: {gradeItem.course.name} (
-                          {gradeItem.course.code})
-                        </p>
+                        <div className="course-badge">
+                          <span
+                            className="course-badge-color"
+                            style={{ backgroundColor: gradeItem.course.color }}
+                          ></span>
+
+                          <span>
+                            {gradeItem.course.name} ({gradeItem.course.code})
+                          </span>
+                        </div>
                       )}
                     </div>
 

@@ -26,7 +26,7 @@ const getGrades = async (req, res) => {
   try {
     const grades = await Grade.find({
       user: req.user._id,
-    }).populate("course", "name code");
+    }).populate("course", "name code color");
 
     res.status(200).json(grades);
   } catch (error) {
