@@ -21,13 +21,33 @@ function Calendar() {
   const [editCourse, setEditCourse] = useState("");
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
-
   const [selectedDate, setSelectedDate] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
+
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setErrorMessage("");
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setSuccessMessage("");
+
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 3000);
+  };
 
   const fetchEvents = async () => {
     try {
@@ -86,8 +106,8 @@ function Calendar() {
   const handleCreateEvent = async (e) => {
     e.preventDefault();
 
-    if (!title || !date || !time || !course) {
-      alert("Please fill in all fields");
+    if (!title.trim() || !date || !time || !course) {
+      showErrorMessage("Please fill in all fields");
       return;
     }
 
@@ -97,7 +117,7 @@ function Calendar() {
       await api.post(
         "/events",
         {
-          title,
+          title: title.trim(),
           type,
           date,
           time,
@@ -115,25 +135,30 @@ function Calendar() {
       setDate("");
       setTime("");
       setCourse("");
-
       setSelectedDate(null);
       setShowEventModal(false);
 
       fetchEvents();
+      showSuccessMessage("Event created successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not create event");
+      showErrorMessage("Could not create event");
     }
   };
 
   const handleEditEvent = async (eventId) => {
+    if (!editTitle.trim() || !editDate || !editTime || !editCourse) {
+      showErrorMessage("Please fill in all fields");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
       await api.put(
         `/events/${eventId}`,
         {
-          title: editTitle,
+          title: editTitle.trim(),
           type: editType,
           date: editDate,
           time: editTime,
@@ -154,9 +179,10 @@ function Calendar() {
       setEditCourse("");
 
       fetchEvents();
+      showSuccessMessage("Event updated successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not update event");
+      showErrorMessage("Could not update event");
     }
   };
 
@@ -179,9 +205,10 @@ function Calendar() {
       });
 
       fetchEvents();
+      showSuccessMessage("Event deleted successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not delete event");
+      showErrorMessage("Could not delete event");
     }
   };
 
@@ -294,13 +321,13 @@ function Calendar() {
       return;
     }
 
-    const formattedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(
-      day
-    ).padStart(2, "0")}`;
+    const formattedDate = `${year}-${String(month + 1).padStart(
+      2,
+      "0"
+    )}-${String(day).padStart(2, "0")}`;
 
     setSelectedDate(formattedDate);
     setDate(formattedDate);
-
     setShowEventModal(true);
   };
 
@@ -313,6 +340,12 @@ function Calendar() {
           <h1>Calendar</h1>
           <p>Your upcoming lectures, exams, deadlines and tasks.</p>
         </section>
+
+        {successMessage && (
+          <div className="success-banner">{successMessage}</div>
+        )}
+
+        {errorMessage && <div className="error-banner">{errorMessage}</div>}
 
         <section className="card">
           <div className="calendar-header">
@@ -467,115 +500,119 @@ function Calendar() {
             </select>
           </div>
 
-          {filteredEvents.map((event) => (
-            <div key={event._id} className="list-item">
-              {editingEventId === event._id ? (
-                <div className="edit-form">
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                  />
+          {filteredEvents.length === 0 ? (
+            <p>No events found.</p>
+          ) : (
+            filteredEvents.map((event) => (
+              <div key={event._id} className="list-item">
+                {editingEventId === event._id ? (
+                  <div className="edit-form">
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                    />
 
-                  <select
-                    value={editType}
-                    onChange={(e) => setEditType(e.target.value)}
-                  >
-                    <option value="exam">Exam</option>
-                    <option value="assignment">Assignment</option>
-                    <option value="lecture">Lecture</option>
-                    <option value="meeting">Meeting</option>
-                    <option value="study">Study</option>
-                    <option value="other">Other</option>
-                  </select>
-
-                  <input
-                    type="date"
-                    value={editDate}
-                    onChange={(e) => setEditDate(e.target.value)}
-                  />
-
-                  <input
-                    type="time"
-                    value={editTime}
-                    onChange={(e) => setEditTime(e.target.value)}
-                  />
-
-                  <select
-                    value={editCourse}
-                    onChange={(e) => setEditCourse(e.target.value)}
-                  >
-                    <option value="">Select course</option>
-
-                    {courses.map((courseItem) => (
-                      <option key={courseItem._id} value={courseItem._id}>
-                        {courseItem.name}
-                      </option>
-                    ))}
-                  </select>
-
-                  <div className="actions">
-                    <button onClick={() => handleEditEvent(event._id)}>
-                      Save
-                    </button>
-
-                    <button
-                      type="button"
-                      className="secondary-button"
-                      onClick={() => setEditingEventId(null)}
+                    <select
+                      value={editType}
+                      onChange={(e) => setEditType(e.target.value)}
                     >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <h3>{event.title}</h3>
+                      <option value="exam">Exam</option>
+                      <option value="assignment">Assignment</option>
+                      <option value="lecture">Lecture</option>
+                      <option value="meeting">Meeting</option>
+                      <option value="study">Study</option>
+                      <option value="other">Other</option>
+                    </select>
 
-                    <p>Type: {event.type}</p>
+                    <input
+                      type="date"
+                      value={editDate}
+                      onChange={(e) => setEditDate(e.target.value)}
+                    />
 
-                    <p>Date: {new Date(event.date).toLocaleDateString()}</p>
+                    <input
+                      type="time"
+                      value={editTime}
+                      onChange={(e) => setEditTime(e.target.value)}
+                    />
 
-                    {event.time && <p>Time: {event.time}</p>}
-
-                    {event.course && (
-                      <p>
-                        Course: {event.course.name} ({event.course.code})
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="actions">
-                    <button
-                      className="secondary-button"
-                      onClick={() => {
-                        setEditingEventId(event._id);
-                        setEditTitle(event.title);
-                        setEditType(event.type);
-                        setEditDate(
-                          event.date
-                            ? new Date(event.date).toISOString().split("T")[0]
-                            : ""
-                        );
-                        setEditTime(event.time || "");
-                        setEditCourse(event.course?._id || "");
-                      }}
+                    <select
+                      value={editCourse}
+                      onChange={(e) => setEditCourse(e.target.value)}
                     >
-                      Edit
-                    </button>
+                      <option value="">Select course</option>
 
-                    <button
-                      className="danger-button"
-                      onClick={() => handleDeleteEvent(event._id)}
-                    >
-                      Delete
-                    </button>
+                      {courses.map((courseItem) => (
+                        <option key={courseItem._id} value={courseItem._id}>
+                          {courseItem.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    <div className="actions">
+                      <button onClick={() => handleEditEvent(event._id)}>
+                        Save
+                      </button>
+
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={() => setEditingEventId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
-                </>
-              )}
-            </div>
-          ))}
+                ) : (
+                  <>
+                    <div>
+                      <h3>{event.title}</h3>
+
+                      <p>Type: {event.type}</p>
+
+                      <p>Date: {new Date(event.date).toLocaleDateString()}</p>
+
+                      {event.time && <p>Time: {event.time}</p>}
+
+                      {event.course && (
+                        <p>
+                          Course: {event.course.name} ({event.course.code})
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="actions">
+                      <button
+                        className="secondary-button"
+                        onClick={() => {
+                          setEditingEventId(event._id);
+                          setEditTitle(event.title);
+                          setEditType(event.type);
+                          setEditDate(
+                            event.date
+                              ? new Date(event.date).toISOString().split("T")[0]
+                              : ""
+                          );
+                          setEditTime(event.time || "");
+                          setEditCourse(event.course?._id || "");
+                        }}
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        className="danger-button"
+                        onClick={() => handleDeleteEvent(event._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))
+          )}
         </section>
       </main>
     </div>

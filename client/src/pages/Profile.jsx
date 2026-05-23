@@ -5,7 +5,28 @@ import api from "../services/api";
 
 function Profile() {
   const [user, setUser] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setErrorMessage("");
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setSuccessMessage("");
+
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 3000);
+  };
 
   const fetchUser = async () => {
     try {
@@ -20,6 +41,7 @@ function Profile() {
       setUser(response.data);
     } catch (error) {
       console.log(error.response?.data || error.message);
+      showErrorMessage("Could not load profile");
     }
   };
 
@@ -31,32 +53,42 @@ function Profile() {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
 
     if (!confirmLogout) {
-        return;
+      return;
     }
 
     localStorage.removeItem("token");
     navigate("/login");
-    };
+  };
 
   const handleProfilePicture = () => {
-    alert("Profile picture upload will be added later.");
+    showErrorMessage("Profile picture upload will be added later");
   };
 
   const handleChangePassword = () => {
-    alert("Change password will be added later.");
+    showErrorMessage("Change password will be added later");
+  };
+
+  const handleNotificationSettings = () => {
+    showErrorMessage("Notification settings will be added later");
+  };
+
+  const handleStudyStatistics = () => {
+    showErrorMessage("Study statistics will be added later");
   };
 
   const handleDeleteAccount = () => {
     const confirmDelete = window.confirm(
-        "Are you sure you want to delete your account? This action cannot be undone."
+      "Are you sure you want to delete your account? This action cannot be undone."
     );
 
     if (!confirmDelete) {
-        return;
+      return;
     }
 
-    alert("Delete account with email and password confirmation will be added later.");
-    };
+    showErrorMessage(
+      "Delete account with email and password confirmation will be added later"
+    );
+  };
 
   return (
     <div>
@@ -68,6 +100,12 @@ function Profile() {
           <p>Your Studora account settings and information.</p>
         </section>
 
+        {successMessage && (
+          <div className="success-banner">{successMessage}</div>
+        )}
+
+        {errorMessage && <div className="error-banner">{errorMessage}</div>}
+
         {user && (
           <section className="card profile-card">
             <div className="profile-avatar">
@@ -77,9 +115,7 @@ function Profile() {
             <h2>{user.username}</h2>
             <p>{user.email}</p>
 
-            <button onClick={handleProfilePicture}>
-              Add Profile Picture
-            </button>
+            <button onClick={handleProfilePicture}>Add Profile Picture</button>
           </section>
         )}
 
@@ -114,15 +150,16 @@ function Profile() {
           <h2>Settings</h2>
 
           <div className="profile-actions">
-            <button onClick={handleChangePassword}>
-              Change Password
-            </button>
+            <button onClick={handleChangePassword}>Change Password</button>
 
-            <button className="secondary-button">
+            <button
+              className="secondary-button"
+              onClick={handleNotificationSettings}
+            >
               Notification Settings
             </button>
 
-            <button className="secondary-button">
+            <button className="secondary-button" onClick={handleStudyStatistics}>
               Study Statistics
             </button>
 

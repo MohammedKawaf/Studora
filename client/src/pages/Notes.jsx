@@ -17,6 +17,27 @@ function Notes() {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setErrorMessage("");
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setSuccessMessage("");
+
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 3000);
+  };
+
   const fetchNotes = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -58,7 +79,7 @@ function Notes() {
     e.preventDefault();
 
     if (!title.trim() || !content.trim() || !course) {
-      alert("Please fill in title, content and course");
+      showErrorMessage("Please fill in title, content and course");
       return;
     }
 
@@ -84,9 +105,10 @@ function Notes() {
       setCourse("");
 
       fetchNotes();
+      showSuccessMessage("Note created successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not create note");
+      showErrorMessage("Could not create note");
     }
   };
 
@@ -109,21 +131,27 @@ function Notes() {
       });
 
       fetchNotes();
+      showSuccessMessage("Note deleted successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not delete note");
+      showErrorMessage("Could not delete note");
     }
   };
 
   const handleEditNote = async (noteId) => {
+    if (!editTitle.trim() || !editContent.trim()) {
+      showErrorMessage("Please fill in title and content");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
       await api.put(
         `/notes/${noteId}`,
         {
-          title: editTitle,
-          content: editContent,
+          title: editTitle.trim(),
+          content: editContent.trim(),
         },
         {
           headers: {
@@ -137,9 +165,10 @@ function Notes() {
       setEditContent("");
 
       fetchNotes();
+      showSuccessMessage("Note updated successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not update note");
+      showErrorMessage("Could not update note");
     }
   };
 
@@ -164,6 +193,12 @@ function Notes() {
           <h1>Notes</h1>
           <p>Create, edit and organize your course notes.</p>
         </section>
+
+        {successMessage && (
+          <div className="success-banner">{successMessage}</div>
+        )}
+
+        {errorMessage && <div className="error-banner">{errorMessage}</div>}
 
         <section className="card">
           <h2>Create Note</h2>

@@ -19,6 +19,27 @@ function Tasks() {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setErrorMessage("");
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setSuccessMessage("");
+
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 3000);
+  };
+
   const fetchTasks = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -60,7 +81,7 @@ function Tasks() {
     e.preventDefault();
 
     if (!title.trim() || !course || !dueDate) {
-      alert("Please fill in all fields");
+      showErrorMessage("Please fill in all fields");
       return;
     }
 
@@ -69,7 +90,7 @@ function Tasks() {
     today.setHours(0, 0, 0, 0);
 
     if (selectedDueDate < today) {
-      alert("Due date cannot be in the past");
+      showErrorMessage("Due date cannot be in the past");
       return;
     }
 
@@ -95,13 +116,14 @@ function Tasks() {
       setDueDate("");
 
       fetchTasks();
+      showSuccessMessage("Task created successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not create task");
+      showErrorMessage("Could not create task");
     }
   };
 
-  const handleToggleCompleted = async (taskId) => {
+  const handleToggleCompleted = async (taskId, completed) => {
     try {
       const token = localStorage.getItem("token");
 
@@ -116,9 +138,15 @@ function Tasks() {
       );
 
       fetchTasks();
+
+      showSuccessMessage(
+        completed
+          ? "Task marked as incomplete"
+          : "Task marked as completed"
+      );
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not update task");
+      showErrorMessage("Could not update task");
     }
   };
 
@@ -141,20 +169,26 @@ function Tasks() {
       });
 
       fetchTasks();
+      showSuccessMessage("Task deleted successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not delete task");
+      showErrorMessage("Could not delete task");
     }
   };
 
   const handleEditTask = async (taskId) => {
+    if (!editTitle.trim() || !editCourse || !editDueDate) {
+      showErrorMessage("Please fill in all fields");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
       await api.put(
         `/tasks/edit/${taskId}`,
         {
-          title: editTitle,
+          title: editTitle.trim(),
           course: editCourse,
           dueDate: editDueDate,
         },
@@ -171,9 +205,10 @@ function Tasks() {
       setEditDueDate("");
 
       fetchTasks();
+      showSuccessMessage("Task updated successfully");
     } catch (error) {
       console.log(error.response?.data || error.message);
-      alert("Could not update task");
+      showErrorMessage("Could not update task");
     }
   };
 
@@ -205,6 +240,12 @@ function Tasks() {
           <h1>Tasks</h1>
           <p>Track assignments, deadlines and study tasks.</p>
         </section>
+
+        {successMessage && (
+          <div className="success-banner">{successMessage}</div>
+        )}
+
+        {errorMessage && <div className="error-banner">{errorMessage}</div>}
 
         <section className="card">
           <h2>Create Task</h2>
@@ -343,7 +384,11 @@ function Tasks() {
                     </div>
 
                     <div className="actions">
-                      <button onClick={() => handleToggleCompleted(task._id)}>
+                      <button
+                        onClick={() =>
+                          handleToggleCompleted(task._id, task.completed)
+                        }
+                      >
                         {task.completed
                           ? "Mark as incomplete"
                           : "Mark as completed"}
