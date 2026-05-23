@@ -288,6 +288,14 @@ function Grades() {
     return matchesSearch && matchesYear && matchesTerm && matchesGrade;
   });
 
+  const [creditGoal, setCreditGoal] = useState(() => {
+    return localStorage.getItem("creditGoal") || "180";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("creditGoal", creditGoal);
+  }, [creditGoal]);
+
   return (
     <div>
       <Navbar user={true} />
@@ -307,9 +315,9 @@ function Grades() {
         <section className="overview-grid">
           <div className="overview-card">
             <h3>Total Credits</h3>
-            <p>{totalCredits} hp</p>
+            <p>{totalCredits} / {creditGoal} hp</p>
           </div>
-
+          
           <div className="overview-card">
             <h3>Passed Courses</h3>
             <p>{passedGrades.length}</p>

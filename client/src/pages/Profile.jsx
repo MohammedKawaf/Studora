@@ -8,6 +8,10 @@ function Profile() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [creditGoal, setCreditGoal] = useState(() => {
+    return localStorage.getItem("creditGoal") || "180";
+  });
+
   const navigate = useNavigate();
 
   const showSuccessMessage = (message) => {
@@ -48,6 +52,15 @@ function Profile() {
   useEffect(() => {
     fetchUser();
   }, []);
+
+  const handleCreditGoalChange = (e) => {
+    const selectedGoal = e.target.value;
+
+    setCreditGoal(selectedGoal);
+    localStorage.setItem("creditGoal", selectedGoal);
+
+    showSuccessMessage("Study program goal updated successfully");
+  };
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
@@ -144,6 +157,31 @@ function Profile() {
               </div>
             </div>
           )}
+        </section>
+
+        <section className="card">
+          <h2>Study Program Settings</h2>
+
+          <div className="profile-info">
+            <div className="profile-item">
+              <h3>Degree Length</h3>
+              <p>Choose how many credits your study program includes.</p>
+
+              <select value={creditGoal} onChange={handleCreditGoalChange}>
+                <option value="60">1 Year (60 hp)</option>
+                <option value="90">1.5 Years (90 hp)</option>
+                <option value="120">2 Years (120 hp)</option>
+                <option value="150">2.5 Years (150 hp)</option>
+                <option value="180">3 Years (180 hp)</option>
+                <option value="210">3.5 Years (210 hp)</option>
+                <option value="240">4 Years (240 hp)</option>
+                <option value="270">4.5 Years (270 hp)</option>
+                <option value="300">5 Years (300 hp)</option>
+                <option value="330">5.5 Years (330 hp)</option>
+                <option value="360">6 Years (360 hp)</option>
+              </select>
+            </div>
+          </div>
         </section>
 
         <section className="card">

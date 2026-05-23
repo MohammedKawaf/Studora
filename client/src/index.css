@@ -642,3 +642,6 @@ body.dark-mode .profile-card p {
   border: 1px solid rgba(148, 163, 184, 0.4);
   color: #cbd5e1;
 }
+.profile-item p {
+  margin-bottom: 16px;
+}
