@@ -691,3 +691,24 @@ body.dark-mode .course-badge {
   gap: 16px;
   margin-top: 24px;
 }
+
+.profile-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.username-edit {
+  margin-top: 12px;
+}
+
+.username-edit .actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.username-edit input {
+  margin-bottom: 4px;
+}

@@ -15,6 +15,9 @@ function Profile() {
   const [deleteEmail, setDeleteEmail] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
 
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+
   const [creditGoal, setCreditGoal] = useState(() => {
     return localStorage.getItem("creditGoal") || "180";
   });
@@ -110,6 +113,42 @@ function Profile() {
     );
   };
 
+  const handleChangeUsername = async () => {
+    if (!newUsername.trim()) {
+      showErrorMessage("Please enter a username");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.put(
+        "/auth/profile",
+        {
+          username: newUsername.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setUser({
+        ...user,
+        username: newUsername.trim(),
+      });
+
+      setIsEditingUsername(false);
+      setNewUsername("");
+
+      showSuccessMessage("Username updated successfully");
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      showErrorMessage("Could not update username");
+    }
+  };
+
   return (
     <div>
       <Navbar user={true} />
@@ -143,9 +182,48 @@ function Profile() {
 
           {user && (
             <div className="profile-info">
-              <div className="profile-item">
-                <h3>Username</h3>
-                <p>{user.username}</p>
+              <div className="profile-item profile-item-row">
+                <div>
+                  <h3>Username</h3>
+
+                  {isEditingUsername ? (
+                    <div className="username-edit">
+                      <input
+                        type="text"
+                        placeholder="New username"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                      />
+
+                      <div className="actions">
+                        <button onClick={handleChangeUsername}>
+                          Save
+                        </button>
+
+                        <button
+                          className="secondary-button"
+                          onClick={() => {
+                            setIsEditingUsername(false);
+                            setNewUsername("");
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p>{user.username}</p>
+                  )}
+                </div>
+
+                {!isEditingUsername && (
+                  <button
+                    className="secondary-button"
+                    onClick={() => setIsEditingUsername(true)}
+                  >
+                    Change Username
+                  </button>
+                )}
               </div>
 
               <div className="profile-item">
