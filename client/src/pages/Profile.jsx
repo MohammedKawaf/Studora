@@ -3,11 +3,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Profile() {
   const [user, setUser] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [deleteEmail, setDeleteEmail] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
 
   const [creditGoal, setCreditGoal] = useState(() => {
     return localStorage.getItem("creditGoal") || "180";
@@ -64,12 +70,6 @@ function Profile() {
   };
 
   const handleLogout = () => {
-    const confirmLogout = window.confirm("Are you sure you want to log out?");
-
-    if (!confirmLogout) {
-      return;
-    }
-
     localStorage.removeItem("token");
     navigate("/login");
   };
@@ -90,17 +90,23 @@ function Profile() {
     showErrorMessage("Study statistics will be added later");
   };
 
-  const handleDeleteAccount = () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your account? This action cannot be undone."
-    );
-
-    if (!confirmDelete) {
+  const handleDeleteAccountConfirm = () => {
+    if (!deleteEmail.trim() || !deletePassword.trim()) {
+      showErrorMessage("Please enter your email and password to confirm");
       return;
     }
 
+    if (user && deleteEmail.trim().toLowerCase() !== user.email.toLowerCase()) {
+      showErrorMessage("Email does not match your account email");
+      return;
+    }
+
+    setShowDeleteAccountModal(false);
+    setDeleteEmail("");
+    setDeletePassword("");
+
     showErrorMessage(
-      "Delete account with email and password confirmation will be added later"
+      "Account deletion with email and password verification will be added later"
     );
   };
 
@@ -201,15 +207,79 @@ function Profile() {
               Study Statistics
             </button>
 
-            <button className="secondary-button" onClick={handleLogout}>
+            <button
+              className="secondary-button"
+              onClick={() => setShowLogoutModal(true)}
+            >
               Logout
             </button>
 
-            <button className="danger-button" onClick={handleDeleteAccount}>
+            <button
+              className="danger-button"
+              onClick={() => setShowDeleteAccountModal(true)}
+            >
               Delete Account
             </button>
           </div>
         </section>
+
+        <ConfirmModal
+          isOpen={showLogoutModal}
+          title="Log out?"
+          message="Are you sure you want to log out?"
+          onCancel={() => setShowLogoutModal(false)}
+          onConfirm={handleLogout}
+        />
+
+        {showDeleteAccountModal && (
+          <div className="modal-overlay">
+            <div className="modal confirm-modal">
+              <h2>Delete account?</h2>
+
+              <p>
+                Are you sure you want to delete your account? This action cannot
+                be undone. For extra security, enter your email and password to
+                confirm.
+              </p>
+
+              <div className="form">
+                <input
+                  type="email"
+                  placeholder="Confirm email"
+                  value={deleteEmail}
+                  onChange={(e) => setDeleteEmail(e.target.value)}
+                />
+
+                <input
+                  type="password"
+                  placeholder="Confirm password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                />
+              </div>
+
+              <div className="confirm-modal-actions">
+                <button
+                  className="secondary-button"
+                  onClick={() => {
+                    setShowDeleteAccountModal(false);
+                    setDeleteEmail("");
+                    setDeletePassword("");
+                  }}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="danger-button"
+                  onClick={handleDeleteAccountConfirm}
+                >
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

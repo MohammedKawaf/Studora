@@ -688,5 +688,6 @@ body.dark-mode .course-badge {
 .confirm-modal-actions {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 16px;
+  margin-top: 24px;
 }
