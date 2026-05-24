@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Tasks() {
   const [tasks, setTasks] = useState([]);
@@ -22,6 +23,9 @@ function Tasks() {
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   const showSuccessMessage = (message) => {
     setSuccessMessage(message);
@@ -141,9 +145,7 @@ function Tasks() {
       fetchTasks();
 
       showSuccessMessage(
-        completed
-          ? "Task marked as incomplete"
-          : "Task marked as completed"
+        completed ? "Task marked as incomplete" : "Task marked as completed"
       );
     } catch (error) {
       console.log(error.response?.data || error.message);
@@ -151,23 +153,22 @@ function Tasks() {
     }
   };
 
-  const handleDeleteTask = async (taskId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this task?"
-    );
-
-    if (!confirmDelete) {
+  const handleDeleteTask = async () => {
+    if (!taskToDelete) {
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
 
-      await api.delete(`/tasks/${taskId}`, {
+      await api.delete(`/tasks/${taskToDelete}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      setShowDeleteModal(false);
+      setTaskToDelete(null);
 
       fetchTasks();
       showSuccessMessage("Task deleted successfully");
@@ -368,7 +369,11 @@ function Tasks() {
                 ) : (
                   <>
                     <div>
-                      <h3 className={task.completed ? "completed-task-title" : ""}>
+                      <h3
+                        className={
+                          task.completed ? "completed-task-title" : ""
+                        }
+                      >
                         {task.title}
                       </h3>
 
@@ -431,7 +436,10 @@ function Tasks() {
 
                       <button
                         className="danger-button"
-                        onClick={() => handleDeleteTask(task._id)}
+                        onClick={() => {
+                          setTaskToDelete(task._id);
+                          setShowDeleteModal(true);
+                        }}
                       >
                         Delete
                       </button>
@@ -442,6 +450,17 @@ function Tasks() {
             ))
           )}
         </section>
+
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          title="Delete task?"
+          message="Are you sure you want to delete this task? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setTaskToDelete(null);
+          }}
+          onConfirm={handleDeleteTask}
+        />
       </main>
     </div>
   );

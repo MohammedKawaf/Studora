@@ -674,3 +674,19 @@ body.dark-mode .course-badge {
   text-decoration: line-through;
   color: #9ca3af;
 }
+
+.confirm-modal {
+  max-width: 420px;
+  text-align: center;
+}
+
+.confirm-modal p {
+  margin: 20px 0;
+  color: #9ca3af;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
