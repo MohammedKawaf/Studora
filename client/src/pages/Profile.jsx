@@ -24,6 +24,8 @@ function Profile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [deleteAccountError, setDeleteAccountError] = useState("");
+
   const [creditGoal, setCreditGoal] = useState(() => {
     return localStorage.getItem("creditGoal") || "180";
   });
@@ -99,24 +101,56 @@ function Profile() {
     showErrorMessage("Study statistics will be added later");
   };
 
-  const handleDeleteAccountConfirm = () => {
+  const handleDeleteAccountConfirm = async () => {
     if (!deleteEmail.trim() || !deletePassword.trim()) {
-      showErrorMessage("Please enter your email and password to confirm");
+      setDeleteAccountError("Please enter your email and password to confirm");
       return;
     }
 
-    if (user && deleteEmail.trim().toLowerCase() !== user.email.toLowerCase()) {
-      showErrorMessage("Email does not match your account email");
+    if (
+      user &&
+      deleteEmail.trim().toLowerCase() !== user.email.toLowerCase()
+    ) {
+      setDeleteAccountError("Email does not match your account email");
       return;
     }
 
-    setShowDeleteAccountModal(false);
-    setDeleteEmail("");
-    setDeletePassword("");
+    try {
+      const token = localStorage.getItem("token");
 
-    showErrorMessage(
-      "Account deletion with email and password verification will be added later"
-    );
+      const response = await api.delete(
+        "/auth/delete-account",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: {
+            email: deleteEmail,
+            password: deletePassword,
+          },
+        }
+      );
+
+      localStorage.removeItem("token");
+
+      setShowDeleteAccountModal(false);
+
+      setDeleteEmail("");
+      setDeletePassword("");
+
+      showSuccessMessage(response.data.message);
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+
+      setDeleteAccountError(
+        error.response?.data?.message ||
+          "Could not delete account"
+      );
+    }
   };
 
   const handleChangeUsername = async () => {
@@ -356,7 +390,10 @@ function Profile() {
 
             <button
               className="danger-button"
-              onClick={() => setShowDeleteAccountModal(true)}
+              onClick={() => {
+                setDeleteAccountError("");
+                setShowDeleteAccountModal(true);
+              }}
             >
               Delete Account
             </button>
@@ -382,6 +419,12 @@ function Profile() {
                 confirm.
               </p>
 
+              {deleteAccountError && (
+                <div className="error-banner">
+                  {deleteAccountError}
+                </div>
+              )}
+
               <div className="form">
                 <input
                   type="email"
@@ -405,6 +448,7 @@ function Profile() {
                     setShowDeleteAccountModal(false);
                     setDeleteEmail("");
                     setDeletePassword("");
+                    setDeleteAccountError("");
                   }}
                 >
                   Cancel

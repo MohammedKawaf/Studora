@@ -161,9 +161,54 @@ const changePassword = async (req, res) => {
   }
 };
 
+const deleteAccount = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Please enter your email and password",
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (email.toLowerCase() !== user.email.toLowerCase()) {
+      return res.status(400).json({
+        message: "Email does not match your account",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Password is incorrect",
+      });
+    }
+
+    await User.findByIdAndDelete(req.user._id);
+
+    res.status(200).json({
+      message: "Account deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   updateProfile,
   changePassword,
+  deleteAccount,
 };
