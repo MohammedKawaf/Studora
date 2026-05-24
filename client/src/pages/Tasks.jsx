@@ -319,7 +319,12 @@ function Tasks() {
             </div>
           ) : (
             filteredTasks.map((task) => (
-              <div key={task._id} className="list-item">
+              <div
+                key={task._id}
+                className={`list-item ${
+                  task.completed ? "completed-task" : ""
+                }`}
+              >
                 {editingTaskId === task._id ? (
                   <div className="edit-form">
                     <input
@@ -363,7 +368,9 @@ function Tasks() {
                 ) : (
                   <>
                     <div>
-                      <h3>{task.title}</h3>
+                      <h3 className={task.completed ? "completed-task-title" : ""}>
+                        {task.title}
+                      </h3>
 
                       {task.course && (
                         <div className="course-badge">
