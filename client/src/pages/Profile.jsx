@@ -18,6 +18,12 @@ function Profile() {
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState("");
 
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [creditGoal, setCreditGoal] = useState(() => {
     return localStorage.getItem("creditGoal") || "180";
   });
@@ -149,6 +155,37 @@ function Profile() {
     }
   };
 
+  const handleChangePasswordSubmit = async () => {
+    if (
+      !currentPassword.trim() ||
+      !newPassword.trim() ||
+      !confirmPassword.trim()
+    ) {
+      showErrorMessage("Please fill in all password fields");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      showErrorMessage("New password must be at least 6 characters");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showErrorMessage("New passwords do not match");
+      return;
+    }
+
+    setShowPasswordModal(false);
+
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+
+    showSuccessMessage(
+      "Password change with backend verification will be added later"
+    );
+  };
+
   return (
     <div>
       <Navbar user={true} />
@@ -272,7 +309,9 @@ function Profile() {
           <h2>Settings</h2>
 
           <div className="profile-actions">
-            <button onClick={handleChangePassword}>Change Password</button>
+            <button onClick={() => setShowPasswordModal(true)}>
+              Change Password
+            </button>
 
             <button
               className="secondary-button"
@@ -353,6 +392,60 @@ function Profile() {
                   onClick={handleDeleteAccountConfirm}
                 >
                   Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showPasswordModal && (
+          <div className="modal-overlay">
+            <div className="modal confirm-modal">
+              <h2>Change Password</h2>
+
+              <p>
+                Enter your current password and choose a new secure password.
+              </p>
+
+              <div className="form">
+                <input
+                  type="password"
+                  placeholder="Current password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
+
+                <input
+                  type="password"
+                  placeholder="New password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+
+                <input
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="confirm-modal-actions">
+                <button
+                  className="secondary-button"
+                  onClick={() => {
+                    setShowPasswordModal(false);
+
+                    setCurrentPassword("");
+                    setNewPassword("");
+                    setConfirmPassword("");
+                  }}
+                >
+                  Cancel
+                </button>
+
+                <button onClick={handleChangePasswordSubmit}>
+                  Update Password
                 </button>
               </div>
             </div>
