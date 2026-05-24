@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Grades() {
   const [grades, setGrades] = useState([]);
@@ -26,6 +27,9 @@ function Grades() {
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [gradeToDelete, setGradeToDelete] = useState(null);
 
   const showSuccessMessage = (message) => {
     setSuccessMessage(message);
@@ -142,23 +146,22 @@ function Grades() {
     }
   };
 
-  const handleDeleteGrade = async (gradeId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this grade?"
-    );
-
-    if (!confirmDelete) {
+  const handleDeleteGrade = async () => {
+    if (!gradeToDelete) {
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
 
-      await api.delete(`/grades/${gradeId}`, {
+      await api.delete(`/grades/${gradeToDelete}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      setShowDeleteModal(false);
+      setGradeToDelete(null);
 
       fetchGrades();
       showSuccessMessage("Grade deleted successfully");
@@ -540,7 +543,10 @@ function Grades() {
 
                       <button
                         className="danger-button"
-                        onClick={() => handleDeleteGrade(gradeItem._id)}
+                        onClick={() => {
+                          setGradeToDelete(gradeItem._id);
+                          setShowDeleteModal(true);
+                        }}
                       >
                         Delete
                       </button>
@@ -551,6 +557,18 @@ function Grades() {
             ))
           )}
         </section>
+
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          title="Delete grade?"
+          message="Are you sure you want to delete this grade? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setGradeToDelete(null);
+          }}
+          onConfirm={handleDeleteGrade}
+        />
+        
       </main>
     </div>
   );
