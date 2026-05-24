@@ -175,15 +175,38 @@ function Profile() {
       return;
     }
 
-    setShowPasswordModal(false);
+    try {
+      const token = localStorage.getItem("token");
 
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+      const response = await api.put(
+        "/auth/change-password",
+        {
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    showSuccessMessage(
-      "Password change with backend verification will be added later"
-    );
+      setShowPasswordModal(false);
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      showSuccessMessage(response.data.message);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+
+      showErrorMessage(
+        error.response?.data?.message ||
+          "Could not update password"
+      );
+    }
   };
 
   return (
