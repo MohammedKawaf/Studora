@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Courses() {
   const [courses, setCourses] = useState([]);
@@ -18,6 +19,9 @@ function Courses() {
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState(null);
 
   const showSuccessMessage = (message) => {
     setSuccessMessage(message);
@@ -122,23 +126,22 @@ function Courses() {
     }
   };
 
-  const handleDeleteCourse = async (courseId, courseName) => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${courseName}?`
-    );
-
-    if (!confirmDelete) {
+  const handleDeleteCourse = async () => {
+    if (!courseToDelete) {
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
 
-      await api.delete(`/courses/${courseId}`, {
+      await api.delete(`/courses/${courseToDelete}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      setShowDeleteModal(false);
+      setCourseToDelete(null);
 
       fetchCourses();
       showSuccessMessage("Course deleted successfully");
@@ -204,7 +207,7 @@ function Courses() {
           successMessage={successMessage}
           errorMessage={errorMessage}
         />
-        
+
         <section className="card">
           <h2>Create Course</h2>
 
@@ -319,9 +322,10 @@ function Courses() {
 
                       <button
                         className="danger-button"
-                        onClick={() =>
-                          handleDeleteCourse(course._id, course.name)
-                        }
+                        onClick={() => {
+                          setCourseToDelete(course._id);
+                          setShowDeleteModal(true);
+                        }}
                       >
                         Delete
                       </button>
@@ -332,6 +336,17 @@ function Courses() {
             ))
           )}
         </section>
+
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          title="Delete course?"
+          message="Are you sure you want to delete this course? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setCourseToDelete(null);
+          }}
+          onConfirm={handleDeleteCourse}
+        />
       </main>
     </div>
   );
