@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Calendar() {
   const [events, setEvents] = useState([]);
@@ -31,6 +32,9 @@ function Calendar() {
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
 
   const showSuccessMessage = (message) => {
     setSuccessMessage(message);
@@ -187,23 +191,22 @@ function Calendar() {
     }
   };
 
-  const handleDeleteEvent = async (eventId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this event?"
-    );
-
-    if (!confirmDelete) {
+  const handleDeleteEvent = async () => {
+    if (!eventToDelete) {
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
 
-      await api.delete(`/events/${eventId}`, {
+      await api.delete(`/events/${eventToDelete}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      setShowDeleteModal(false);
+      setEventToDelete(null);
 
       fetchEvents();
       showSuccessMessage("Event deleted successfully");
@@ -616,7 +619,10 @@ function Calendar() {
 
                       <button
                         className="danger-button"
-                        onClick={() => handleDeleteEvent(event._id)}
+                        onClick={() => {
+                          setEventToDelete(event._id);
+                          setShowDeleteModal(true);
+                        }}
                       >
                         Delete
                       </button>
@@ -627,6 +633,17 @@ function Calendar() {
             ))
           )}
         </section>
+
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          title="Delete event?"
+          message="Are you sure you want to delete this event? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setEventToDelete(null);
+          }}
+          onConfirm={handleDeleteEvent}
+        />
       </main>
     </div>
   );
