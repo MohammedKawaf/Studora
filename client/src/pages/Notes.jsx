@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Notes() {
   const [notes, setNotes] = useState([]);
@@ -20,6 +21,9 @@ function Notes() {
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState(null);
 
   const showSuccessMessage = (message) => {
     setSuccessMessage(message);
@@ -113,23 +117,22 @@ function Notes() {
     }
   };
 
-  const handleDeleteNote = async (noteId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this note?"
-    );
-
-    if (!confirmDelete) {
+  const handleDeleteNote = async () => {
+    if (!noteToDelete) {
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
 
-      await api.delete(`/notes/${noteId}`, {
+      await api.delete(`/notes/${noteToDelete}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      setShowDeleteModal(false);
+      setNoteToDelete(null);
 
       fetchNotes();
       showSuccessMessage("Note deleted successfully");
@@ -199,7 +202,7 @@ function Notes() {
           successMessage={successMessage}
           errorMessage={errorMessage}
         />
-        
+
         <section className="card">
           <h2>Create Note</h2>
 
@@ -325,7 +328,10 @@ function Notes() {
 
                       <button
                         className="danger-button"
-                        onClick={() => handleDeleteNote(note._id)}
+                        onClick={() => {
+                          setNoteToDelete(note._id);
+                          setShowDeleteModal(true);
+                        }}
                       >
                         Delete
                       </button>
@@ -336,6 +342,17 @@ function Notes() {
             ))
           )}
         </section>
+
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          title="Delete note?"
+          message="Are you sure you want to delete this note? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setNoteToDelete(null);
+          }}
+          onConfirm={handleDeleteNote}
+        />
       </main>
     </div>
   );
