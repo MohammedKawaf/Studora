@@ -74,13 +74,7 @@ const loginUser = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { username } = req.body;
-
-    if (!username || !username.trim()) {
-      return res.status(400).json({
-        message: "Username is required",
-      });
-    }
+    const { username, school, program, studyYear } = req.body;
 
     const user = await User.findById(req.user._id);
 
@@ -90,7 +84,27 @@ const updateProfile = async (req, res) => {
       });
     }
 
-    user.username = username.trim();
+    if (username !== undefined) {
+      if (!username.trim()) {
+        return res.status(400).json({
+          message: "Username is required",
+        });
+      }
+
+      user.username = username.trim();
+    }
+
+    if (school !== undefined) {
+      user.school = school.trim();
+    }
+
+    if (program !== undefined) {
+      user.program = program.trim();
+    }
+
+    if (studyYear !== undefined) {
+      user.studyYear = studyYear;
+    }
 
     const updatedUser = await user.save();
 
@@ -98,6 +112,9 @@ const updateProfile = async (req, res) => {
       _id: updatedUser._id,
       username: updatedUser.username,
       email: updatedUser.email,
+      school: updatedUser.school,
+      program: updatedUser.program,
+      studyYear: updatedUser.studyYear,
       message: "Profile updated successfully",
     });
   } catch (error) {

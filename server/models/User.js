@@ -18,6 +18,23 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    school: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    program: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    studyYear: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

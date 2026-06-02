@@ -26,6 +26,11 @@ function Profile() {
 
   const [deleteAccountError, setDeleteAccountError] = useState("");
 
+  const [isEditingAcademicInfo, setIsEditingAcademicInfo] = useState(false);
+  const [school, setSchool] = useState("");
+  const [program, setProgram] = useState("");
+  const [studyYear, setStudyYear] = useState("");
+
   const [creditGoal, setCreditGoal] = useState(() => {
     return localStorage.getItem("creditGoal") || "180";
   });
@@ -61,6 +66,9 @@ function Profile() {
       });
 
       setUser(response.data);
+      setSchool(response.data.school || "");
+      setProgram(response.data.program || "");
+      setStudyYear(response.data.studyYear || "");
     } catch (error) {
       console.log(error.response?.data || error.message);
       showErrorMessage("Could not load profile");
@@ -243,6 +251,35 @@ function Profile() {
     }
   };
 
+  const handleUpdateAcademicInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.put(
+        "/auth/profile",
+        {
+          school,
+          program,
+          studyYear,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setUser(response.data);
+      setIsEditingAcademicInfo(false);
+
+      showSuccessMessage("Academic information updated successfully");
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      showErrorMessage("Could not update academic information");
+    }
+  };
+
+
   return (
     <div>
       <Navbar user={true} />
@@ -333,6 +370,91 @@ function Profile() {
                     : "Light Mode"}
                 </p>
               </div>
+            </div>
+          )}
+        </section>
+
+        <section className="card">
+          <div className="section-header">
+            <h2>Academic Information</h2>
+
+            {!isEditingAcademicInfo && (
+              <button
+                className="secondary-button"
+                onClick={() => setIsEditingAcademicInfo(true)}
+              >
+                Edit
+              </button>
+            )}
+          </div>
+
+          {user && (
+            <div className="profile-info">
+              {isEditingAcademicInfo ? (
+                <div className="username-edit">
+                  <input
+                    type="text"
+                    placeholder="School"
+                    value={school}
+                    onChange={(e) => setSchool(e.target.value)}
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Program"
+                    value={program}
+                    onChange={(e) => setProgram(e.target.value)}
+                  />
+
+                  <select
+                    value={studyYear}
+                    onChange={(e) => setStudyYear(e.target.value)}
+                  >
+                    <option value="">Select study year</option>
+                    <option value="1">Year 1</option>
+                    <option value="2">Year 2</option>
+                    <option value="3">Year 3</option>
+                    <option value="4">Year 4</option>
+                    <option value="5">Year 5</option>
+                    <option value="6">Year 6</option>
+                  </select>
+
+                  <div className="actions">
+                    <button onClick={handleUpdateAcademicInfo}>Save</button>
+
+                    <button
+                      className="secondary-button"
+                      onClick={() => {
+                        setIsEditingAcademicInfo(false);
+                        setSchool(user.school || "");
+                        setProgram(user.program || "");
+                        setStudyYear(user.studyYear || "");
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="profile-item">
+                    <h3>School</h3>
+                    <p>{user.school || "Not added yet"}</p>
+                  </div>
+
+                  <div className="profile-item">
+                    <h3>Program</h3>
+                    <p>{user.program || "Not added yet"}</p>
+                  </div>
+
+                  <div className="profile-item profile-item-row">
+                    <div>
+                      <h3>Study Year</h3>
+                      <p>{user.studyYear ? `Year ${user.studyYear}` : "Not added yet"}</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </section>
