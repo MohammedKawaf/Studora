@@ -8,9 +8,11 @@ const {
   updateProfile,
   changePassword,
   deleteAccount,
+  uploadProfileImage,
 } = require("../controllers/authController");
 
 const { protect } = require("../middleware/authMiddleware");
+const upload = require("../middleware/uploadMiddleware");
 
 router.post("/register", registerUser);
 
@@ -25,5 +27,17 @@ router.put("/profile", protect, updateProfile);
 router.put("/change-password", protect, changePassword);
 
 router.delete("/delete-account", protect, deleteAccount);
+
+router.post(
+  "/upload-profile-image",
+  protect,
+  upload.single("profileImage"),
+  (req, res) => {
+    res.status(200).json({
+      message: "Upload route works",
+      file: req.file,
+    });
+  }
+);
 
 module.exports = router;
