@@ -9,6 +9,7 @@ function Home() {
   const [notes, setNotes] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
+  const [grades, setGrades] = useState([]);
   
   const [notificationSettings, setNotificationSettings] = useState({
     taskReminders: true,
@@ -97,6 +98,22 @@ function Home() {
     }
   };
 
+  const fetchGrades = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.get("/grades", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setGrades(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
   useEffect(() => {
     const savedSettings = localStorage.getItem("notificationSettings");
 
@@ -109,6 +126,7 @@ function Home() {
     fetchNotes();
     fetchTasks();
     fetchEvents();
+    fetchGrades();
   }, []);
 
   const today = new Date();
@@ -168,6 +186,18 @@ function Home() {
       completedTasks,
       upcomingDeadlines: upcomingDeadlines.length,
       upcomingEvents: upcomingEvents.length,
+    };
+
+    const passedGrades = grades.filter((grade) => {
+      const value = String(grade.grade || "").toUpperCase();
+
+      return value !== "F" && value !== "U" && value !== "FAIL";
+    }).length;
+
+    const gradeOverviewData = {
+      registeredCourses: courses.length,
+      passedCourses: passedGrades,
+      coursesWithoutGrades: Math.max(courses.length - grades.length, 0),
     };
 
   return (
@@ -230,6 +260,29 @@ function Home() {
               <div className="overview-card">
                 <h3>Upcoming Deadlines</h3>
                 <p>{weeklySummaryData.upcomingDeadlines}</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {notificationSettings.gradeNotifications && (
+          <section className="card">
+            <h2>Grade Overview</h2>
+
+            <div className="overview-grid">
+              <div className="overview-card">
+                <h3>Registered Courses</h3>
+                <p>{gradeOverviewData.registeredCourses}</p>
+              </div>
+
+              <div className="overview-card">
+                <h3>Passed Courses</h3>
+                <p>{gradeOverviewData.passedCourses}</p>
+              </div>
+
+              <div className="overview-card">
+                <h3>Courses Without Grades</h3>
+                <p>{gradeOverviewData.coursesWithoutGrades}</p>
               </div>
             </div>
           </section>
