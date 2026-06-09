@@ -9,6 +9,13 @@ function Home() {
   const [notes, setNotes] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
+  
+  const [notificationSettings, setNotificationSettings] = useState({
+    taskReminders: true,
+    calendarReminders: true,
+    gradeNotifications: false,
+    weeklySummary: true,
+  });
 
   const fetchUser = async () => {
     try {
@@ -91,6 +98,12 @@ function Home() {
   };
 
   useEffect(() => {
+    const savedSettings = localStorage.getItem("notificationSettings");
+
+    if (savedSettings) {
+      setNotificationSettings(JSON.parse(savedSettings));
+    }
+
     fetchUser();
     fetchCourses();
     fetchNotes();
@@ -147,6 +160,16 @@ function Home() {
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .slice(0, 5);
 
+    const completedTasks = tasks.filter((task) => task.completed).length;
+
+    const weeklySummaryData = {
+      totalCourses: courses.length,
+      totalNotes: notes.length,
+      completedTasks,
+      upcomingDeadlines: upcomingDeadlines.length,
+      upcomingEvents: upcomingEvents.length,
+    };
+
   return (
     <div>
       <Navbar user={true} />
@@ -184,28 +207,65 @@ function Home() {
           </div>
         </section>
 
-        <section className="card">
-          <h2>Smart Reminders</h2>
+        {notificationSettings.weeklySummary && (
+          <section className="card">
+            <h2>Weekly Summary</h2>
 
-          <div className="reminder-grid">
-            <div className="reminder-card overdue-reminder">
-              <h3>Overdue Tasks</h3>
-              <p>{overdueTasks.length}</p>
+            <div className="overview-grid">
+              <div className="overview-card">
+                <h3>Courses</h3>
+                <p>{weeklySummaryData.totalCourses}</p>
+              </div>
+
+              <div className="overview-card">
+                <h3>Notes</h3>
+                <p>{weeklySummaryData.totalNotes}</p>
+              </div>
+
+              <div className="overview-card">
+                <h3>Completed Tasks</h3>
+                <p>{weeklySummaryData.completedTasks}</p>
+              </div>
+
+              <div className="overview-card">
+                <h3>Upcoming Deadlines</h3>
+                <p>{weeklySummaryData.upcomingDeadlines}</p>
+              </div>
             </div>
+          </section>
+        )}
 
-            <div className="reminder-card soon-reminder">
-              <h3>Due Soon</h3>
-              <p>{dueSoonTasks.length}</p>
+        {(notificationSettings.taskReminders ||
+          notificationSettings.calendarReminders) && (
+          <section className="card">
+            <h2>Smart Reminders</h2>
+
+            <div className="reminder-grid">
+              {notificationSettings.taskReminders && (
+                <>
+                  <div className="reminder-card overdue-reminder">
+                    <h3>Overdue Tasks</h3>
+                    <p>{overdueTasks.length}</p>
+                  </div>
+
+                  <div className="reminder-card soon-reminder">
+                    <h3>Due Soon</h3>
+                    <p>{dueSoonTasks.length}</p>
+                  </div>
+                </>
+              )}
+
+              {notificationSettings.calendarReminders && (
+                <div className="reminder-card today-reminder">
+                  <h3>Today's Events</h3>
+                  <p>{todaysEvents.length}</p>
+                </div>
+              )}
             </div>
+          </section>
+        )}
 
-            <div className="reminder-card today-reminder">
-              <h3>Today's Events</h3>
-              <p>{todaysEvents.length}</p>
-            </div>
-          </div>
-        </section>
-
-        {overdueTasks.length > 0 && (
+        {notificationSettings.taskReminders && overdueTasks.length > 0 && (
           <section className="card">
             <h2>Overdue Tasks</h2>
 
@@ -227,7 +287,7 @@ function Home() {
           </section>
         )}
 
-        {dueSoonTasks.length > 0 && (
+        {notificationSettings.taskReminders && dueSoonTasks.length > 0 && (
           <section className="card">
             <h2>Due Soon</h2>
 
@@ -249,7 +309,7 @@ function Home() {
           </section>
         )}
 
-        {todaysEvents.length > 0 && (
+        {notificationSettings.calendarReminders && todaysEvents.length > 0 && (
           <section className="card">
             <h2>Today's Events</h2>
 
@@ -273,57 +333,61 @@ function Home() {
           </section>
         )}
 
-        <section className="card">
-          <h2>Upcoming Deadlines</h2>
+        {notificationSettings.taskReminders && (
+          <section className="card">
+            <h2>Upcoming Deadlines</h2>
 
-          {upcomingDeadlines.length === 0 ? (
-            <p>No upcoming deadlines.</p>
-          ) : (
-            upcomingDeadlines.map((task) => (
-              <div key={task._id} className="list-item">
-                <div>
-                  <h3>{task.title}</h3>
+            {upcomingDeadlines.length === 0 ? (
+              <p>No upcoming deadlines.</p>
+            ) : (
+              upcomingDeadlines.map((task) => (
+                <div key={task._id} className="list-item">
+                  <div>
+                    <h3>{task.title}</h3>
 
-                  {task.course && (
-                    <p>
-                      Course: {task.course.name} ({task.course.code})
-                    </p>
-                  )}
+                    {task.course && (
+                      <p>
+                        Course: {task.course.name} ({task.course.code})
+                      </p>
+                    )}
 
-                  <p>Due date: {new Date(task.dueDate).toLocaleDateString()}</p>
+                    <p>Due date: {new Date(task.dueDate).toLocaleDateString()}</p>
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
-        </section>
+              ))
+            )}
+          </section>
+        )}
 
-        <section className="card">
-          <h2>Upcoming Events</h2>
+        {notificationSettings.calendarReminders && (
+          <section className="card">
+            <h2>Upcoming Events</h2>
 
-          {upcomingEvents.length === 0 ? (
-            <p>No upcoming events.</p>
-          ) : (
-            upcomingEvents.map((event) => (
-              <div key={event._id} className="list-item">
-                <div>
-                  <h3>{event.title}</h3>
+            {upcomingEvents.length === 0 ? (
+              <p>No upcoming events.</p>
+            ) : (
+              upcomingEvents.map((event) => (
+                <div key={event._id} className="list-item">
+                  <div>
+                    <h3>{event.title}</h3>
 
-                  <p>Type: {event.type}</p>
+                    <p>Type: {event.type}</p>
 
-                  <p>Date: {new Date(event.date).toLocaleDateString()}</p>
+                    <p>Date: {new Date(event.date).toLocaleDateString()}</p>
 
-                  {event.time && <p>Time: {event.time}</p>}
+                    {event.time && <p>Time: {event.time}</p>}
 
-                  {event.course && (
-                    <p>
-                      Course: {event.course.name} ({event.course.code})
-                    </p>
-                  )}
+                    {event.course && (
+                      <p>
+                        Course: {event.course.name} ({event.course.code})
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
-        </section>
+              ))
+            )}
+          </section>
+        )}
       </main>
     </div>
   );
