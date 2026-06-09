@@ -272,6 +272,29 @@ function Grades() {
     return "G";
   })();
 
+  const numericGradeSystem = ["U", "3", "4", "5"];
+  const letterGradeSystem = ["U", "G", "VG", "MVG"];
+
+  const hasOnlyNumericSystem = grades.some((gradeItem) =>
+    ["3", "4", "5"].includes(gradeItem.grade)
+  );
+
+  const gradeChartLabels = hasOnlyNumericSystem
+    ? numericGradeSystem
+    : letterGradeSystem;
+
+  const gradeChartData = gradeChartLabels.map((gradeLabel) => {
+    return {
+      label: gradeLabel,
+      count: grades.filter((gradeItem) => gradeItem.grade === gradeLabel).length,
+    };
+  });
+
+  const maxGradeCount = Math.max(
+    ...gradeChartData.map((gradeItem) => gradeItem.count),
+    1
+  );
+
   const filteredGrades = grades.filter((gradeItem) => {
     const matchesSearch = gradeItem.title
       .toLowerCase()
@@ -315,31 +338,65 @@ function Grades() {
           errorMessage={errorMessage}
         />
 
-        <section className="overview-grid">
-          <div className="overview-card">
-            <h3>Total Credits</h3>
-            <p>{totalCredits} / {creditGoal} hp</p>
-          </div>
+        <section className="card">
+          <h2>Grade Overview</h2>
 
-          <div className="overview-card">
-            <h3>Passed Courses</h3>
-            <p>{passedGrades.length}</p>
-          </div>
+          <div className="overview-grid">
+            <div className="overview-card">
+              <h3>Total Credits</h3>
+              <p>{totalCredits} / {creditGoal} hp</p>
+            </div>
 
-          <div className="overview-card">
-            <h3>Failed Courses</h3>
-            <p>{failedGrades.length}</p>
-          </div>
+            <div className="overview-card">
+              <h3>Passed Courses</h3>
+              <p>{passedGrades.length}</p>
+            </div>
 
-          <div className="overview-card">
-            <h3>{hasNumericGrades ? "Average Score" : "Average Grade"}</h3>
-            <p>{averageGrade}</p>
-          </div>
+            <div className="overview-card">
+              <h3>Failed Courses</h3>
+              <p>{failedGrades.length}</p>
+            </div>
 
-          <div className="overview-card">
-            <h3>Total Courses</h3>
-            <p>{totalCourses}</p>
+            <div className="overview-card">
+              <h3>{hasNumericGrades ? "Average Score" : "Average Grade"}</h3>
+              <p>{averageGrade}</p>
+            </div>
+
+            <div className="overview-card">
+              <h3>Total Courses</h3>
+              <p>{totalCourses}</p>
+            </div>
           </div>
+        </section>
+
+        <section className="card grade-chart-card">
+          <h2>Grade Chart</h2>
+
+          {grades.length === 0 ? (
+            <div className="empty-state">
+              <h3>📊 No grade data yet</h3>
+              <p>Add grades to see your grade distribution.</p>
+            </div>
+          ) : (
+            <div className="grade-chart">
+              {gradeChartData.map((gradeItem) => (
+                <div key={gradeItem.label} className="grade-chart-row">
+                  <div className="grade-chart-label">{gradeItem.label}</div>
+
+                  <div className="grade-chart-track">
+                    <div
+                      className="grade-chart-bar"
+                      style={{
+                        width: `${(gradeItem.count / maxGradeCount) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+
+                  <div className="grade-chart-count">{gradeItem.count}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="card">
