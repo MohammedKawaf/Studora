@@ -74,7 +74,7 @@ const loginUser = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { username, school, program, studyYear } = req.body;
+    const { username, school, program, studyYear, profilePicture } = req.body;
 
     const user = await User.findById(req.user._id);
 
@@ -106,6 +106,10 @@ const updateProfile = async (req, res) => {
       user.studyYear = studyYear;
     }
 
+    if (profilePicture !== undefined) {
+      user.profilePicture = profilePicture;
+    }
+
     const updatedUser = await user.save();
 
     res.status(200).json({
@@ -115,6 +119,7 @@ const updateProfile = async (req, res) => {
       school: updatedUser.school,
       program: updatedUser.program,
       studyYear: updatedUser.studyYear,
+      profilePicture: updatedUser.profilePicture,
       message: "Profile updated successfully",
     });
   } catch (error) {
@@ -259,4 +264,5 @@ module.exports = {
   updateProfile,
   changePassword,
   deleteAccount,
+  uploadProfileImage, 
 };

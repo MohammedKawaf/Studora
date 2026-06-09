@@ -31,6 +31,10 @@ function Profile() {
   const [program, setProgram] = useState("");
   const [studyYear, setStudyYear] = useState("");
 
+  const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
+  const [profilePicturePreview, setProfilePicturePreview] = useState("");
+  const [profilePictureFile, setProfilePictureFile] = useState(null);
+
   const [creditGoal, setCreditGoal] = useState(() => {
     return localStorage.getItem("creditGoal") || "180";
   });
@@ -94,7 +98,18 @@ function Profile() {
   };
 
   const handleProfilePicture = () => {
-    showErrorMessage("Profile picture upload will be added later");
+    setShowProfilePictureModal(true);
+  };
+
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    setProfilePictureFile(file);
+    setProfilePicturePreview(URL.createObjectURL(file));
   };
 
   const handleChangePassword = () => {
@@ -581,6 +596,54 @@ function Profile() {
                   onClick={handleDeleteAccountConfirm}
                 >
                   Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showProfilePictureModal && (
+          <div className="modal-overlay">
+            <div className="modal confirm-modal">
+              <h2>Upload Profile Picture</h2>
+
+              <p>Select an image from your computer.</p>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+              />
+
+              {profilePicturePreview && (
+                <div style={{ marginTop: "15px", textAlign: "center" }}>
+                  <img
+                    src={profilePicturePreview}
+                    alt="Preview"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </div>
+              )}
+
+              <div className="confirm-modal-actions">
+                <button
+                  className="secondary-button"
+                  onClick={() => {
+                    setShowProfilePictureModal(false);
+                    setProfilePicturePreview("");
+                    setProfilePictureFile(null);
+                  }}
+                >
+                  Cancel
+                </button>
+
+                <button>
+                  Save Picture
                 </button>
               </div>
             </div>
