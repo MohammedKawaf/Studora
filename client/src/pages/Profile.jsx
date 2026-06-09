@@ -153,10 +153,6 @@ function Profile() {
     showSuccessMessage("Notification settings updated successfully");
   };
 
-  const handleStudyStatistics = () => {
-    showErrorMessage("Study statistics will be added later");
-  };
-
   const handleDeleteAccountConfirm = async () => {
     if (!deleteEmail.trim() || !deletePassword.trim()) {
       setDeleteAccountError("Please enter your email and password to confirm");
@@ -545,10 +541,6 @@ function Profile() {
               onClick={handleNotificationSettings}
             >
               Notification Settings
-            </button>
-
-            <button className="secondary-button" onClick={handleStudyStatistics}>
-              Study Statistics
             </button>
 
             <button
