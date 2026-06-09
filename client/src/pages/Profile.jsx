@@ -35,6 +35,22 @@ function Profile() {
   const [profilePicturePreview, setProfilePicturePreview] = useState("");
   const [profilePictureFile, setProfilePictureFile] = useState(null);
 
+  const [showNotificationSettingsModal, setShowNotificationSettingsModal] =
+    useState(false);
+
+  const [notificationSettings, setNotificationSettings] = useState(() => {
+    const savedSettings = localStorage.getItem("notificationSettings");
+
+    return savedSettings
+      ? JSON.parse(savedSettings)
+      : {
+          taskReminders: true,
+          calendarReminders: true,
+          gradeNotifications: false,
+          weeklySummary: true,
+        };
+  });  
+
   const [creditGoal, setCreditGoal] = useState(() => {
     return localStorage.getItem("creditGoal") || "180";
   });
@@ -117,7 +133,24 @@ function Profile() {
   };
 
   const handleNotificationSettings = () => {
-    showErrorMessage("Notification settings will be added later");
+    setShowNotificationSettingsModal(true);
+  };
+
+  const handleNotificationSettingChange = (settingName) => {
+    setNotificationSettings((prevSettings) => ({
+      ...prevSettings,
+      [settingName]: !prevSettings[settingName],
+    }));
+  };
+
+  const handleSaveNotificationSettings = () => {
+    localStorage.setItem(
+      "notificationSettings",
+      JSON.stringify(notificationSettings)
+    );
+
+    setShowNotificationSettingsModal(false);
+    showSuccessMessage("Notification settings updated successfully");
   };
 
   const handleStudyStatistics = () => {
@@ -596,6 +629,91 @@ function Profile() {
                   onClick={handleDeleteAccountConfirm}
                 >
                   Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showNotificationSettingsModal && (
+          <div className="modal-overlay">
+            <div className="modal confirm-modal">
+              <h2>Notification Settings</h2>
+
+              <p>Choose which study notifications you want to receive.</p>
+
+              <div className="profile-info">
+                <label className="profile-item profile-item-row">
+                  <div>
+                    <h3>Task reminders</h3>
+                    <p>Get reminders about upcoming and overdue tasks.</p>
+                  </div>
+
+                  <input
+                    type="checkbox"
+                    checked={notificationSettings.taskReminders}
+                    onChange={() =>
+                      handleNotificationSettingChange("taskReminders")
+                    }
+                  />
+                </label>
+
+                <label className="profile-item profile-item-row">
+                  <div>
+                    <h3>Calendar reminders</h3>
+                    <p>Get reminders about upcoming calendar events.</p>
+                  </div>
+
+                  <input
+                    type="checkbox"
+                    checked={notificationSettings.calendarReminders}
+                    onChange={() =>
+                      handleNotificationSettingChange("calendarReminders")
+                    }
+                  />
+                </label>
+
+                <label className="profile-item profile-item-row">
+                  <div>
+                    <h3>Grade notifications</h3>
+                    <p>Get notified when grade-related updates are available.</p>
+                  </div>
+
+                  <input
+                    type="checkbox"
+                    checked={notificationSettings.gradeNotifications}
+                    onChange={() =>
+                      handleNotificationSettingChange("gradeNotifications")
+                    }
+                  />
+                </label>
+
+                <label className="profile-item profile-item-row">
+                  <div>
+                    <h3>Weekly summary</h3>
+                    <p>Receive a weekly summary of your study progress.</p>
+                  </div>
+
+                  <input
+                    type="checkbox"
+                    checked={notificationSettings.weeklySummary}
+                    onChange={() =>
+                      handleNotificationSettingChange("weeklySummary")
+                    }
+                  />
+                </label>
+              </div>
+
+              <div className="confirm-modal-actions">
+                <button
+                  className="secondary-button"
+                  onClick={() => setShowNotificationSettingsModal(false)}
+                >
+                  Cancel
+                </button>
+
+                <button onClick={handleSaveNotificationSettings}>
+                  Save Settings
                 </button>
               </div>
             </div>
