@@ -803,3 +803,10 @@ body.dark-mode .autosave-status {
   border-radius: 50%;
   object-fit: cover;
 }
+
+.last-active-text {
+  color: #9ca3af;
+  font-size: 14px;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}

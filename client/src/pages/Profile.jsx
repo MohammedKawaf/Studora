@@ -421,11 +421,21 @@ function Profile() {
             </div>
 
             <h2>{user.username}</h2>
+
             <p>{user.email}</p>
+
+            <p className="last-active-text">
+              Last active:{" "}
+              {user.lastActive
+                ? new Date(user.lastActive).toLocaleString()
+                : "Unknown"}
+            </p>
 
             <div className="actions" style={{ justifyContent: "center" }}>
               <button onClick={handleProfilePicture}>
-                {user.profileImage ? "Change Profile Picture" : "Add Profile Picture"}
+                {user.profileImage
+                  ? "Change Profile Picture"
+                  : "Add Profile Picture"}
               </button>
 
               {user.profileImage && (

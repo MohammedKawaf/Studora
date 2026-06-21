@@ -19,7 +19,11 @@ router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.get("/profile", protect, (req, res) => {
+router.get("/profile", protect, async (req, res) => {
+  req.user.lastActive = new Date();
+
+  await req.user.save();
+
   res.status(200).json(req.user);
 });
 
