@@ -241,6 +241,30 @@ function Profile() {
     }
   };
 
+  const validatePassword = (passwordValue) => {
+    if (passwordValue.length < 8) {
+      return "Password must be at least 8 characters";
+    }
+
+    if (!/[A-Z]/.test(passwordValue)) {
+      return "Password must contain at least one uppercase letter";
+    }
+
+    if (!/[a-z]/.test(passwordValue)) {
+      return "Password must contain at least one lowercase letter";
+    }
+
+    if (!/[0-9]/.test(passwordValue)) {
+      return "Password must contain at least one number";
+    }
+
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(passwordValue)) {
+      return "Password must contain at least one special character";
+    }
+
+    return "";
+  };
+
   const handleChangePasswordSubmit = async () => {
     if (
       !currentPassword.trim() ||
@@ -251,11 +275,12 @@ function Profile() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      showErrorMessage("New password must be at least 6 characters");
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      showErrorMessage(passwordError);
       return;
     }
-
+    
     if (newPassword !== confirmPassword) {
       showErrorMessage("New passwords do not match");
       return;

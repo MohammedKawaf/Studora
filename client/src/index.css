@@ -810,3 +810,37 @@ body.dark-mode .autosave-status {
   margin-top: -10px;
   margin-bottom: 20px;
 }
+
+.password-rules {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background-color: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  color: #4b5563;
+}
+
+.password-rules p {
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.password-rules ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.password-rules li {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+body.dark-mode .password-rules {
+  background-color: rgba(96, 165, 250, 0.08);
+  border-color: rgba(96, 165, 250, 0.25);
+  color: #cbd5e1;
+}
+
+body.dark-mode .password-rules p {
+  color: #f9fafb;
+}

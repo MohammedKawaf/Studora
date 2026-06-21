@@ -2,9 +2,41 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
+const validatePassword = (passwordValue) => {
+  if (passwordValue.length < 8) {
+    return "Password must be at least 8 characters";
+  }
+
+  if (!/[A-Z]/.test(passwordValue)) {
+    return "Password must contain at least one uppercase letter";
+  }
+
+  if (!/[a-z]/.test(passwordValue)) {
+    return "Password must contain at least one lowercase letter";
+  }
+
+  if (!/[0-9]/.test(passwordValue)) {
+    return "Password must contain at least one number";
+  }
+
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(passwordValue)) {
+    return "Password must contain at least one special character";
+  }
+
+  return "";
+};
+
 const registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+
+    const passwordError = validatePassword(password);
+
+    if (passwordError) {
+      return res.status(400).json({
+        message: passwordError,
+      });
+    }
 
     const userExists = await User.findOne({ email });
 
@@ -139,12 +171,14 @@ const changePassword = async (req, res) => {
       });
     }
 
-    if (newPassword.length < 6) {
+    const passwordError = validatePassword(newPassword);
+
+    if (passwordError) {
       return res.status(400).json({
-        message: "New password must be at least 6 characters",
+        message: passwordError,
       });
     }
-
+    
     if (newPassword !== confirmPassword) {
       return res.status(400).json({
         message: "New passwords do not match",
