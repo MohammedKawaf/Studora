@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
 import ConfirmModal from "../components/ConfirmModal";
+import translations from "../translations";
 
 function Notes() {
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
+
   const [notes, setNotes] = useState([]);
   const [courses, setCourses] = useState([]);
 
@@ -85,7 +89,7 @@ function Notes() {
     e.preventDefault();
 
     if (!title.trim() || !content.trim() || !course) {
-      showErrorMessage("Please fill in title, content and course");
+      showErrorMessage(t.noteTitleContentCourseRequired);
       return;
     }
 
@@ -111,10 +115,10 @@ function Notes() {
       setCourse("");
 
       fetchNotes();
-      showSuccessMessage("Note created successfully");
+      showSuccessMessage(t.noteCreatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not create note");
+      showErrorMessage(t.couldNotCreateNote);
     }
   };
 
@@ -136,16 +140,16 @@ function Notes() {
       setNoteToDelete(null);
 
       fetchNotes();
-      showSuccessMessage("Note deleted successfully");
+      showSuccessMessage(t.noteDeletedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not delete note");
+      showErrorMessage(t.couldNotDeleteNote);
     }
   };
 
   const handleEditNote = async (noteId) => {
     if (!editTitle.trim() || !editContent.trim()) {
-      showErrorMessage("Please fill in title and content");
+      showErrorMessage(t.noteTitleContentRequired);
       return;
     }
 
@@ -170,10 +174,10 @@ function Notes() {
       setEditContent("");
 
       fetchNotes();
-      showSuccessMessage("Note updated successfully");
+      showSuccessMessage(t.noteUpdatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not update note");
+      showErrorMessage(t.couldNotUpdateNote);
     }
   };
 
@@ -183,7 +187,7 @@ function Notes() {
     }
 
     try {
-      setAutosaveStatus("Saving...");
+      setAutosaveStatus(t.saving);
 
       const token = localStorage.getItem("token");
 
@@ -200,14 +204,14 @@ function Notes() {
         }
       );
 
-      setAutosaveStatus("Saved automatically");
+      setAutosaveStatus(t.savedAutomatically);
 
       setTimeout(() => {
         setAutosaveStatus("");
       }, 2000);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      setAutosaveStatus("Autosave failed");
+      setAutosaveStatus(t.autosaveFailed);
     }
   };
 
@@ -241,8 +245,8 @@ function Notes() {
 
       <main className="page">
         <section className="page-header">
-          <h1>Notes</h1>
-          <p>Create, edit and organize your course notes.</p>
+          <h1>{t.notes}</h1>
+          <p>{t.notesSubtitle}</p>
         </section>
 
         <NotificationBanner
@@ -251,24 +255,24 @@ function Notes() {
         />
 
         <section className="card">
-          <h2>Create Note</h2>
+          <h2>{t.createNote}</h2>
 
           <form onSubmit={handleCreateNote} className="form">
             <input
               type="text"
-              placeholder="Note title"
+              placeholder={t.noteTitle}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
 
             <textarea
-              placeholder="Write your note here..."
+              placeholder={t.writeYourNoteHere}
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />
 
             <select value={course} onChange={(e) => setCourse(e.target.value)}>
-              <option value="">Select course</option>
+              <option value="">{t.selectCourse}</option>
 
               {courses.map((courseItem) => (
                 <option key={courseItem._id} value={courseItem._id}>
@@ -277,17 +281,17 @@ function Notes() {
               ))}
             </select>
 
-            <button type="submit">Add Note</button>
+            <button type="submit">{t.addNote}</button>
           </form>
         </section>
 
         <section className="card">
-          <h2>Your Notes</h2>
+          <h2>{t.yourNotes}</h2>
 
           <div className="calendar-filters">
             <input
               type="text"
-              placeholder="Search notes..."
+              placeholder={t.searchNotes}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -296,7 +300,7 @@ function Notes() {
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
             >
-              <option value="">All Courses</option>
+              <option value="">{t.allCourses}</option>
 
               {courses.map((courseItem) => (
                 <option key={courseItem._id} value={courseItem._id}>
@@ -308,8 +312,8 @@ function Notes() {
 
           {filteredNotes.length === 0 ? (
             <div className="empty-state">
-              <h3>📝 No notes yet</h3>
-              <p>Create notes for your courses and study material.</p>
+              <h3>📝 {t.noNotesYet}</h3>
+              <p>{t.createNotesForCourses}</p>
             </div>
           ) : (
             filteredNotes.map((note) => (
@@ -333,14 +337,14 @@ function Notes() {
 
                     <div className="actions">
                       <button onClick={() => handleEditNote(note._id)}>
-                        Save
+                        {t.save}
                       </button>
 
                       <button
                         className="secondary-button"
                         onClick={() => setEditingNoteId(null)}
                       >
-                        Cancel
+                        {t.cancel}
                       </button>
                     </div>
                   </div>
@@ -374,7 +378,7 @@ function Notes() {
                           setEditContent(note.content);
                         }}
                       >
-                        Edit
+                        {t.edit}
                       </button>
 
                       <button
@@ -384,7 +388,7 @@ function Notes() {
                           setShowDeleteModal(true);
                         }}
                       >
-                        Delete
+                        {t.delete}
                       </button>
                     </div>
                   </>
@@ -396,8 +400,8 @@ function Notes() {
 
         <ConfirmModal
           isOpen={showDeleteModal}
-          title="Delete note?"
-          message="Are you sure you want to delete this note? This action cannot be undone."
+          title={t.deleteNoteTitle}
+          message={t.deleteNoteMessage}
           onCancel={() => {
             setShowDeleteModal(false);
             setNoteToDelete(null);

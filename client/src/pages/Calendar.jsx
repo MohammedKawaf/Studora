@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
 import ConfirmModal from "../components/ConfirmModal";
+import translations from "../translations";
 
 function Calendar() {
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
+
   const [events, setEvents] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -112,7 +116,7 @@ function Calendar() {
     e.preventDefault();
 
     if (!title.trim() || !date || !time || !course) {
-      showErrorMessage("Please fill in all fields");
+      showErrorMessage(t.pleaseFillAllFields);
       return;
     }
 
@@ -144,16 +148,16 @@ function Calendar() {
       setShowEventModal(false);
 
       fetchEvents();
-      showSuccessMessage("Event created successfully");
+      showSuccessMessage(t.eventCreatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not create event");
+      showErrorMessage(t.couldNotCreateEvent);
     }
   };
 
   const handleEditEvent = async (eventId) => {
     if (!editTitle.trim() || !editDate || !editTime || !editCourse) {
-      showErrorMessage("Please fill in all fields");
+      showErrorMessage(t.pleaseFillAllFields);
       return;
     }
 
@@ -184,10 +188,10 @@ function Calendar() {
       setEditCourse("");
 
       fetchEvents();
-      showSuccessMessage("Event updated successfully");
+      showSuccessMessage(t.eventUpdatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not update event");
+      showErrorMessage(t.couldNotUpdateEvent);
     }
   };
 
@@ -209,10 +213,10 @@ function Calendar() {
       setEventToDelete(null);
 
       fetchEvents();
-      showSuccessMessage("Event deleted successfully");
+      showSuccessMessage(t.eventDeletedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not delete event");
+      showErrorMessage(t.couldNotDeleteEvent);
     }
   };
 
@@ -228,10 +232,13 @@ function Calendar() {
     );
   };
 
-  const monthName = currentMonth.toLocaleString("default", {
-    month: "long",
-    year: "numeric",
-  });
+  const monthName = currentMonth.toLocaleString(
+    language === "sv" ? "sv-SE" : "en-US",
+    {
+      month: "long",
+      year: "numeric",
+    }
+  );
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -335,36 +342,46 @@ function Calendar() {
     setShowEventModal(true);
   };
 
+  const getTranslatedType = (eventType) => {
+    if (eventType === "exam") return t.exam;
+    if (eventType === "assignment") return t.assignment;
+    if (eventType === "lecture") return t.lecture;
+    if (eventType === "meeting") return t.meeting;
+    if (eventType === "study") return t.study;
+    if (eventType === "task") return t.taskDeadlines;
+    return t.other;
+  };
+
   return (
     <div>
       <Navbar user={true} />
 
       <main className="page">
         <section className="page-header">
-          <h1>Calendar</h1>
-          <p>Your upcoming lectures, exams, deadlines and tasks.</p>
+          <h1>{t.calendar}</h1>
+          <p>{t.calendarSubtitle}</p>
         </section>
 
         <NotificationBanner
           successMessage={successMessage}
           errorMessage={errorMessage}
         />
-        
+
         <section className="card">
           <div className="calendar-header">
-            <button onClick={goToPreviousMonth}>Previous</button>
+            <button onClick={goToPreviousMonth}>{t.previous}</button>
             <h2>{monthName}</h2>
-            <button onClick={goToNextMonth}>Next</button>
+            <button onClick={goToNextMonth}>{t.next}</button>
           </div>
 
           <div className="calendar-grid calendar-weekdays">
-            <strong>Sun</strong>
-            <strong>Mon</strong>
-            <strong>Tue</strong>
-            <strong>Wed</strong>
-            <strong>Thu</strong>
-            <strong>Fri</strong>
-            <strong>Sat</strong>
+            <strong>{t.sun}</strong>
+            <strong>{t.mon}</strong>
+            <strong>{t.tue}</strong>
+            <strong>{t.wed}</strong>
+            <strong>{t.thu}</strong>
+            <strong>{t.fri}</strong>
+            <strong>{t.sat}</strong>
           </div>
 
           <div className="calendar-grid">
@@ -398,7 +415,9 @@ function Calendar() {
                         }`}
                       >
                         {item.itemType === "task" ? (
-                          <>Task: {item.title}</>
+                          <>
+                            {t.task}: {item.title}
+                          </>
                         ) : (
                           <>
                             {item.time && <span>{item.time} </span>}
@@ -417,28 +436,28 @@ function Calendar() {
         {showEventModal && (
           <div className="modal-overlay">
             <div className="modal">
-              <h2>Create Event</h2>
+              <h2>{t.createEvent}</h2>
 
               <p>
-                Selected date:{" "}
+                {t.selectedDate}:{" "}
                 <strong>{new Date(selectedDate).toLocaleDateString()}</strong>
               </p>
 
               <form onSubmit={handleCreateEvent} className="form">
                 <input
                   type="text"
-                  placeholder="Event title"
+                  placeholder={t.eventTitle}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
 
                 <select value={type} onChange={(e) => setType(e.target.value)}>
-                  <option value="exam">Exam</option>
-                  <option value="assignment">Assignment</option>
-                  <option value="lecture">Lecture</option>
-                  <option value="meeting">Meeting</option>
-                  <option value="study">Study</option>
-                  <option value="other">Other</option>
+                  <option value="exam">{t.exam}</option>
+                  <option value="assignment">{t.assignment}</option>
+                  <option value="lecture">{t.lecture}</option>
+                  <option value="meeting">{t.meeting}</option>
+                  <option value="study">{t.study}</option>
+                  <option value="other">{t.other}</option>
                 </select>
 
                 <input
@@ -451,7 +470,7 @@ function Calendar() {
                   value={course}
                   onChange={(e) => setCourse(e.target.value)}
                 >
-                  <option value="">Select course</option>
+                  <option value="">{t.selectCourse}</option>
 
                   {courses.map((courseItem) => (
                     <option key={courseItem._id} value={courseItem._id}>
@@ -460,14 +479,14 @@ function Calendar() {
                   ))}
                 </select>
 
-                <button type="submit">Add Event</button>
+                <button type="submit">{t.addEvent}</button>
 
                 <button
                   type="button"
                   className="secondary-button"
                   onClick={() => setShowEventModal(false)}
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
               </form>
             </div>
@@ -475,12 +494,12 @@ function Calendar() {
         )}
 
         <section className="card">
-          <h2>Your Events</h2>
+          <h2>{t.yourEvents}</h2>
 
           <div className="calendar-filters">
             <input
               type="text"
-              placeholder="Search calendar..."
+              placeholder={t.searchCalendar}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -489,21 +508,21 @@ function Calendar() {
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
             >
-              <option value="">All Types</option>
-              <option value="exam">Exam</option>
-              <option value="assignment">Assignment</option>
-              <option value="lecture">Lecture</option>
-              <option value="meeting">Meeting</option>
-              <option value="study">Study</option>
-              <option value="other">Other</option>
-              <option value="task">Task deadlines</option>
+              <option value="">{t.allTypes}</option>
+              <option value="exam">{t.exam}</option>
+              <option value="assignment">{t.assignment}</option>
+              <option value="lecture">{t.lecture}</option>
+              <option value="meeting">{t.meeting}</option>
+              <option value="study">{t.study}</option>
+              <option value="other">{t.other}</option>
+              <option value="task">{t.taskDeadlines}</option>
             </select>
 
             <select
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
             >
-              <option value="">All Courses</option>
+              <option value="">{t.allCourses}</option>
 
               {courses.map((courseItem) => (
                 <option key={courseItem._id} value={courseItem._id}>
@@ -515,8 +534,8 @@ function Calendar() {
 
           {filteredEvents.length === 0 ? (
             <div className="empty-state">
-              <h3>📅 No events yet</h3>
-              <p>Create calendar events and manage your schedule.</p>
+              <h3>📅 {t.noEventsYet}</h3>
+              <p>{t.createCalendarEvents}</p>
             </div>
           ) : (
             filteredEvents.map((event) => (
@@ -533,12 +552,12 @@ function Calendar() {
                       value={editType}
                       onChange={(e) => setEditType(e.target.value)}
                     >
-                      <option value="exam">Exam</option>
-                      <option value="assignment">Assignment</option>
-                      <option value="lecture">Lecture</option>
-                      <option value="meeting">Meeting</option>
-                      <option value="study">Study</option>
-                      <option value="other">Other</option>
+                      <option value="exam">{t.exam}</option>
+                      <option value="assignment">{t.assignment}</option>
+                      <option value="lecture">{t.lecture}</option>
+                      <option value="meeting">{t.meeting}</option>
+                      <option value="study">{t.study}</option>
+                      <option value="other">{t.other}</option>
                     </select>
 
                     <input
@@ -557,7 +576,7 @@ function Calendar() {
                       value={editCourse}
                       onChange={(e) => setEditCourse(e.target.value)}
                     >
-                      <option value="">Select course</option>
+                      <option value="">{t.selectCourse}</option>
 
                       {courses.map((courseItem) => (
                         <option key={courseItem._id} value={courseItem._id}>
@@ -568,7 +587,7 @@ function Calendar() {
 
                     <div className="actions">
                       <button onClick={() => handleEditEvent(event._id)}>
-                        Save
+                        {t.save}
                       </button>
 
                       <button
@@ -576,7 +595,7 @@ function Calendar() {
                         className="secondary-button"
                         onClick={() => setEditingEventId(null)}
                       >
-                        Cancel
+                        {t.cancel}
                       </button>
                     </div>
                   </div>
@@ -585,15 +604,23 @@ function Calendar() {
                     <div>
                       <h3>{event.title}</h3>
 
-                      <p>Type: {event.type}</p>
+                      <p>
+                        {t.type}: {getTranslatedType(event.type)}
+                      </p>
 
-                      <p>Date: {new Date(event.date).toLocaleDateString()}</p>
+                      <p>
+                        {t.date}: {new Date(event.date).toLocaleDateString()}
+                      </p>
 
-                      {event.time && <p>Time: {event.time}</p>}
+                      {event.time && (
+                        <p>
+                          {t.time}: {event.time}
+                        </p>
+                      )}
 
                       {event.course && (
                         <p>
-                          Course: {event.course.name} ({event.course.code})
+                          {t.course}: {event.course.name} ({event.course.code})
                         </p>
                       )}
                     </div>
@@ -614,7 +641,7 @@ function Calendar() {
                           setEditCourse(event.course?._id || "");
                         }}
                       >
-                        Edit
+                        {t.edit}
                       </button>
 
                       <button
@@ -624,7 +651,7 @@ function Calendar() {
                           setShowDeleteModal(true);
                         }}
                       >
-                        Delete
+                        {t.delete}
                       </button>
                     </div>
                   </>
@@ -636,8 +663,8 @@ function Calendar() {
 
         <ConfirmModal
           isOpen={showDeleteModal}
-          title="Delete event?"
-          message="Are you sure you want to delete this event? This action cannot be undone."
+          title={t.deleteEventTitle}
+          message={t.deleteEventMessage}
           onCancel={() => {
             setShowDeleteModal(false);
             setEventToDelete(null);

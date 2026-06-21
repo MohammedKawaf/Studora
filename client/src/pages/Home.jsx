@@ -1,8 +1,12 @@
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import translations from "../translations";
 
 function Home() {
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
+
   const [user, setUser] = useState(null);
 
   const [courses, setCourses] = useState([]);
@@ -10,7 +14,7 @@ function Home() {
   const [tasks, setTasks] = useState([]);
   const [events, setEvents] = useState([]);
   const [grades, setGrades] = useState([]);
-  
+
   const [notificationSettings, setNotificationSettings] = useState({
     taskReminders: true,
     calendarReminders: true,
@@ -178,27 +182,27 @@ function Home() {
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .slice(0, 5);
 
-    const completedTasks = tasks.filter((task) => task.completed).length;
+  const completedTasks = tasks.filter((task) => task.completed).length;
 
-    const weeklySummaryData = {
-      totalCourses: courses.length,
-      totalNotes: notes.length,
-      completedTasks,
-      upcomingDeadlines: upcomingDeadlines.length,
-      upcomingEvents: upcomingEvents.length,
-    };
+  const weeklySummaryData = {
+    totalCourses: courses.length,
+    totalNotes: notes.length,
+    completedTasks,
+    upcomingDeadlines: upcomingDeadlines.length,
+    upcomingEvents: upcomingEvents.length,
+  };
 
-    const passedGrades = grades.filter((grade) => {
-      const value = String(grade.grade || "").toUpperCase();
+  const passedGrades = grades.filter((grade) => {
+    const value = String(grade.grade || "").toUpperCase();
 
-      return value !== "F" && value !== "U" && value !== "FAIL";
-    }).length;
+    return value !== "F" && value !== "U" && value !== "FAIL";
+  }).length;
 
-    const gradeOverviewData = {
-      registeredCourses: courses.length,
-      passedCourses: passedGrades,
-      coursesWithoutGrades: Math.max(courses.length - grades.length, 0),
-    };
+  const gradeOverviewData = {
+    registeredCourses: courses.length,
+    passedCourses: passedGrades,
+    coursesWithoutGrades: Math.max(courses.length - grades.length, 0),
+  };
 
   return (
     <div>
@@ -206,32 +210,36 @@ function Home() {
 
       <main className="page">
         <section className="page-header">
-          <h1>Studora Home</h1>
+          <h1>{t.studoraHome}</h1>
 
-          {user && <p>Welcome back, {user.username}</p>}
+          {user && (
+            <p>
+              {t.welcomeBack}, {user.username}
+            </p>
+          )}
         </section>
 
         <section className="card">
-          <h2>Your Overview</h2>
+          <h2>{t.yourOverview}</h2>
 
           <div className="overview-grid">
             <div className="overview-card">
-              <h3>Courses</h3>
+              <h3>{t.courses}</h3>
               <p>{courses.length}</p>
             </div>
 
             <div className="overview-card">
-              <h3>Notes</h3>
+              <h3>{t.notes}</h3>
               <p>{notes.length}</p>
             </div>
 
             <div className="overview-card">
-              <h3>Tasks</h3>
+              <h3>{t.tasks}</h3>
               <p>{tasks.length}</p>
             </div>
 
             <div className="overview-card">
-              <h3>Events</h3>
+              <h3>{t.events}</h3>
               <p>{events.length}</p>
             </div>
           </div>
@@ -239,26 +247,26 @@ function Home() {
 
         {notificationSettings.weeklySummary && (
           <section className="card">
-            <h2>Weekly Summary</h2>
+            <h2>{t.weeklySummary}</h2>
 
             <div className="overview-grid">
               <div className="overview-card">
-                <h3>Courses</h3>
+                <h3>{t.courses}</h3>
                 <p>{weeklySummaryData.totalCourses}</p>
               </div>
 
               <div className="overview-card">
-                <h3>Notes</h3>
+                <h3>{t.notes}</h3>
                 <p>{weeklySummaryData.totalNotes}</p>
               </div>
 
               <div className="overview-card">
-                <h3>Completed Tasks</h3>
+                <h3>{t.completedTasks}</h3>
                 <p>{weeklySummaryData.completedTasks}</p>
               </div>
 
               <div className="overview-card">
-                <h3>Upcoming Deadlines</h3>
+                <h3>{t.upcomingDeadlines}</h3>
                 <p>{weeklySummaryData.upcomingDeadlines}</p>
               </div>
             </div>
@@ -267,21 +275,21 @@ function Home() {
 
         {notificationSettings.gradeNotifications && (
           <section className="card">
-            <h2>Grade Overview</h2>
+            <h2>{t.gradeOverview}</h2>
 
             <div className="overview-grid">
               <div className="overview-card">
-                <h3>Registered Courses</h3>
+                <h3>{t.registeredCourses}</h3>
                 <p>{gradeOverviewData.registeredCourses}</p>
               </div>
 
               <div className="overview-card">
-                <h3>Passed Courses</h3>
+                <h3>{t.passedCourses}</h3>
                 <p>{gradeOverviewData.passedCourses}</p>
               </div>
 
               <div className="overview-card">
-                <h3>Courses Without Grades</h3>
+                <h3>{t.coursesWithoutGrades}</h3>
                 <p>{gradeOverviewData.coursesWithoutGrades}</p>
               </div>
             </div>
@@ -291,18 +299,18 @@ function Home() {
         {(notificationSettings.taskReminders ||
           notificationSettings.calendarReminders) && (
           <section className="card">
-            <h2>Smart Reminders</h2>
+            <h2>{t.smartReminders}</h2>
 
             <div className="reminder-grid">
               {notificationSettings.taskReminders && (
                 <>
                   <div className="reminder-card overdue-reminder">
-                    <h3>Overdue Tasks</h3>
+                    <h3>{t.overdueTasks}</h3>
                     <p>{overdueTasks.length}</p>
                   </div>
 
                   <div className="reminder-card soon-reminder">
-                    <h3>Due Soon</h3>
+                    <h3>{t.dueSoon}</h3>
                     <p>{dueSoonTasks.length}</p>
                   </div>
                 </>
@@ -310,7 +318,7 @@ function Home() {
 
               {notificationSettings.calendarReminders && (
                 <div className="reminder-card today-reminder">
-                  <h3>Today's Events</h3>
+                  <h3>{t.todaysEvents}</h3>
                   <p>{todaysEvents.length}</p>
                 </div>
               )}
@@ -320,7 +328,7 @@ function Home() {
 
         {notificationSettings.taskReminders && overdueTasks.length > 0 && (
           <section className="card">
-            <h2>Overdue Tasks</h2>
+            <h2>{t.overdueTasks}</h2>
 
             {overdueTasks.map((task) => (
               <div key={task._id} className="list-item">
@@ -329,11 +337,14 @@ function Home() {
 
                   {task.course && (
                     <p>
-                      Course: {task.course.name} ({task.course.code})
+                      {t.course}: {task.course.name} ({task.course.code})
                     </p>
                   )}
 
-                  <p>Due date: {new Date(task.dueDate).toLocaleDateString()}</p>
+                  <p>
+                    {t.dueDate}:{" "}
+                    {new Date(task.dueDate).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
             ))}
@@ -342,7 +353,7 @@ function Home() {
 
         {notificationSettings.taskReminders && dueSoonTasks.length > 0 && (
           <section className="card">
-            <h2>Due Soon</h2>
+            <h2>{t.dueSoon}</h2>
 
             {dueSoonTasks.map((task) => (
               <div key={task._id} className="list-item">
@@ -351,11 +362,14 @@ function Home() {
 
                   {task.course && (
                     <p>
-                      Course: {task.course.name} ({task.course.code})
+                      {t.course}: {task.course.name} ({task.course.code})
                     </p>
                   )}
 
-                  <p>Due date: {new Date(task.dueDate).toLocaleDateString()}</p>
+                  <p>
+                    {t.dueDate}:{" "}
+                    {new Date(task.dueDate).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
             ))}
@@ -364,20 +378,26 @@ function Home() {
 
         {notificationSettings.calendarReminders && todaysEvents.length > 0 && (
           <section className="card">
-            <h2>Today's Events</h2>
+            <h2>{t.todaysEvents}</h2>
 
             {todaysEvents.map((event) => (
               <div key={event._id} className="list-item">
                 <div>
                   <h3>{event.title}</h3>
 
-                  <p>Type: {event.type}</p>
+                  <p>
+                    {t.type}: {event.type}
+                  </p>
 
-                  {event.time && <p>Time: {event.time}</p>}
+                  {event.time && (
+                    <p>
+                      {t.time}: {event.time}
+                    </p>
+                  )}
 
                   {event.course && (
                     <p>
-                      Course: {event.course.name} ({event.course.code})
+                      {t.course}: {event.course.name} ({event.course.code})
                     </p>
                   )}
                 </div>
@@ -388,10 +408,10 @@ function Home() {
 
         {notificationSettings.taskReminders && (
           <section className="card">
-            <h2>Upcoming Deadlines</h2>
+            <h2>{t.upcomingDeadlines}</h2>
 
             {upcomingDeadlines.length === 0 ? (
-              <p>No upcoming deadlines.</p>
+              <p>{t.noUpcomingDeadlines}</p>
             ) : (
               upcomingDeadlines.map((task) => (
                 <div key={task._id} className="list-item">
@@ -400,11 +420,14 @@ function Home() {
 
                     {task.course && (
                       <p>
-                        Course: {task.course.name} ({task.course.code})
+                        {t.course}: {task.course.name} ({task.course.code})
                       </p>
                     )}
 
-                    <p>Due date: {new Date(task.dueDate).toLocaleDateString()}</p>
+                    <p>
+                      {t.dueDate}:{" "}
+                      {new Date(task.dueDate).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
               ))
@@ -414,25 +437,33 @@ function Home() {
 
         {notificationSettings.calendarReminders && (
           <section className="card">
-            <h2>Upcoming Events</h2>
+            <h2>{t.upcomingEvents}</h2>
 
             {upcomingEvents.length === 0 ? (
-              <p>No upcoming events.</p>
+              <p>{t.noUpcomingEvents}</p>
             ) : (
               upcomingEvents.map((event) => (
                 <div key={event._id} className="list-item">
                   <div>
                     <h3>{event.title}</h3>
 
-                    <p>Type: {event.type}</p>
+                    <p>
+                      {t.type}: {event.type}
+                    </p>
 
-                    <p>Date: {new Date(event.date).toLocaleDateString()}</p>
+                    <p>
+                      {t.date}: {new Date(event.date).toLocaleDateString()}
+                    </p>
 
-                    {event.time && <p>Time: {event.time}</p>}
+                    {event.time && (
+                      <p>
+                        {t.time}: {event.time}
+                      </p>
+                    )}
 
                     {event.course && (
                       <p>
-                        Course: {event.course.name} ({event.course.code})
+                        {t.course}: {event.course.name} ({event.course.code})
                       </p>
                     )}
                   </div>

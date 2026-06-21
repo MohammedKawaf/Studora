@@ -1,7 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
+import translations from "../translations";
 
 function Navbar({ user }) {
   const navigate = useNavigate();
+
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -12,20 +16,20 @@ function Navbar({ user }) {
     <nav>
       {user && (
         <>
-          <Link to="/">Home</Link>{" "}
-          <Link to="/courses">Courses</Link>{" "}
-          <Link to="/notes">Notes</Link>{" "}
-          <Link to="/tasks">Tasks</Link>{" "}
-          <Link to="/calendar">Calendar</Link>{" "}
-          <Link to="/grades">Grades</Link>{" "}
-          <Link to="/profile">Profile</Link>{" "}
+          <Link to="/">{t.home}</Link>{" "}
+          <Link to="/courses">{t.courses}</Link>{" "}
+          <Link to="/notes">{t.notes}</Link>{" "}
+          <Link to="/tasks">{t.tasks}</Link>{" "}
+          <Link to="/calendar">{t.calendar}</Link>{" "}
+          <Link to="/grades">{t.grades}</Link>{" "}
+          <Link to="/profile">{t.profile}</Link>{" "}
         </>
       )}
 
       {!user && (
         <>
-          <Link to="/login">Login</Link>{" "}
-          <Link to="/register">Register</Link>{" "}
+          <Link to="/login">{t.login}</Link>{" "}
+          <Link to="/register">{t.register}</Link>{" "}
         </>
       )}
     </nav>

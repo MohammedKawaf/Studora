@@ -2,8 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
+import translations from "../translations";
 
 function Register() {
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,23 +39,23 @@ function Register() {
 
   const validatePassword = (passwordValue) => {
     if (passwordValue.length < 8) {
-      return "Password must be at least 8 characters";
+      return t.passwordMinLength;
     }
 
     if (!/[A-Z]/.test(passwordValue)) {
-      return "Password must contain at least one uppercase letter";
+      return t.passwordNeedsUppercase;
     }
 
     if (!/[a-z]/.test(passwordValue)) {
-      return "Password must contain at least one lowercase letter";
+      return t.passwordNeedsLowercase;
     }
 
     if (!/[0-9]/.test(passwordValue)) {
-      return "Password must contain at least one number";
+      return t.passwordNeedsNumber;
     }
 
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(passwordValue)) {
-      return "Password must contain at least one special character";
+      return t.passwordNeedsSpecial;
     }
 
     return "";
@@ -61,11 +65,12 @@ function Register() {
     e.preventDefault();
 
     if (!username.trim() || !email.trim() || !password.trim()) {
-      showErrorMessage("Please fill in all fields");
+      showErrorMessage(t.pleaseFillAllFields);
       return;
     }
 
-  const passwordError = validatePassword(password);
+    const passwordError = validatePassword(password);
+
     if (passwordError) {
       showErrorMessage(passwordError);
       return;
@@ -78,7 +83,7 @@ function Register() {
         password: password.trim(),
       });
 
-      showSuccessMessage("Account created successfully!");
+      showSuccessMessage(t.accountCreatedSuccessfully);
 
       setTimeout(() => {
         navigate("/login");
@@ -87,7 +92,7 @@ function Register() {
       console.log(error.response?.data || error.message);
 
       showErrorMessage(
-        error.response?.data?.message || "Registration failed"
+        error.response?.data?.message || t.registrationFailed
       );
     }
   };
@@ -95,11 +100,11 @@ function Register() {
   return (
     <div className="auth-page">
       <nav>
-        <Link to="/login">Login</Link>
+        <Link to="/login">{t.login}</Link>
       </nav>
 
       <main className="auth-container">
-        <h1>Create account</h1>
+        <h1>{t.createAccount}</h1>
 
         <NotificationBanner
           successMessage={successMessage}
@@ -109,14 +114,14 @@ function Register() {
         <form onSubmit={handleRegister} className="form">
           <input
             type="text"
-            placeholder="Username"
+            placeholder={t.username}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
 
           <input
             type="email"
-            placeholder="Email"
+            placeholder={t.email}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -124,7 +129,7 @@ function Register() {
           <div className="password-input-wrapper">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder={t.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -134,21 +139,23 @@ function Register() {
               className="password-toggle-button"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? t.hide : t.show}
             </button>
           </div>
 
           <div className="password-rules">
-            <p>Password must contain:</p>
+            <p>{t.passwordMustContain}</p>
+
             <ul>
-              <li>At least 8 characters</li>
-              <li>One uppercase letter</li>
-              <li>One lowercase letter</li>
-              <li>One number</li>
-              <li>One special character, for example ! @ # $ %</li>
+              <li>{t.passwordRuleLength}</li>
+              <li>{t.passwordRuleUppercase}</li>
+              <li>{t.passwordRuleLowercase}</li>
+              <li>{t.passwordRuleNumber}</li>
+              <li>{t.passwordRuleSpecial}</li>
             </ul>
           </div>
-          <button type="submit">Register</button>
+
+          <button type="submit">{t.register}</button>
         </form>
       </main>
     </div>

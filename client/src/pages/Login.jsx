@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
+import translations from "../translations";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -11,6 +12,9 @@ function Login() {
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
 
   const navigate = useNavigate();
 
@@ -36,7 +40,7 @@ function Login() {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-      showErrorMessage("Please fill in all fields");
+      showErrorMessage(t.pleaseFillAllFields);
       return;
     }
 
@@ -48,26 +52,25 @@ function Login() {
 
       localStorage.setItem("token", response.data.token);
 
-      showSuccessMessage("Login successful!");
-
+      showSuccessMessage(t.loginSuccessful);
       setTimeout(() => {
         navigate("/");
       }, 1000);
     } catch (error) {
       console.log(error.response?.data || error.message);
 
-      showErrorMessage("Login failed");
+      showErrorMessage(t.loginFailed);
     }
   };
 
   return (
     <div className="auth-page">
       <nav>
-        <Link to="/register">Register</Link>
+        <Link to="/register">{t.register}</Link>
       </nav>
 
       <main className="auth-container">
-        <h1>Login</h1>
+        <h1>{t.login}</h1>
 
         <NotificationBanner
           successMessage={successMessage}
@@ -77,7 +80,7 @@ function Login() {
         <form onSubmit={handleLogin} className="form">
           <input
             type="email"
-            placeholder="Email"
+            placeholder={t.email}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -85,7 +88,7 @@ function Login() {
           <div className="password-input-wrapper">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder={t.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -95,11 +98,11 @@ function Login() {
               className="password-toggle-button"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? t.hide : t.show}
             </button>
           </div>
 
-          <button type="submit">Login</button>
+          <button type="submit">{t.login}</button>
         </form>
       </main>
     </div>

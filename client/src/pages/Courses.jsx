@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
 import ConfirmModal from "../components/ConfirmModal";
+import translations from "../translations";
 
 function Courses() {
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
+
   const [courses, setCourses] = useState([]);
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -82,7 +86,7 @@ function Courses() {
     e.preventDefault();
 
     if (!name.trim() || !code.trim()) {
-      showErrorMessage("Please enter a course name and course code");
+      showErrorMessage(t.courseNameAndCodeRequired);
       return;
     }
 
@@ -93,7 +97,7 @@ function Courses() {
     );
 
     if (duplicateCourse) {
-      showErrorMessage("A course with this name or code already exists");
+      showErrorMessage(t.courseAlreadyExists);
       return;
     }
 
@@ -119,10 +123,10 @@ function Courses() {
       setColor("#2563eb");
 
       fetchCourses();
-      showSuccessMessage("Course created successfully");
+      showSuccessMessage(t.courseCreatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not create course");
+      showErrorMessage(t.couldNotCreateCourse);
     }
   };
 
@@ -144,16 +148,16 @@ function Courses() {
       setCourseToDelete(null);
 
       fetchCourses();
-      showSuccessMessage("Course deleted successfully");
+      showSuccessMessage(t.courseDeletedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not delete course");
+      showErrorMessage(t.couldNotDeleteCourse);
     }
   };
 
   const handleEditCourse = async (courseId) => {
     if (!editName.trim() || !editCode.trim()) {
-      showErrorMessage("Please enter a course name and course code");
+      showErrorMessage(t.courseNameAndCodeRequired);
       return;
     }
 
@@ -178,10 +182,10 @@ function Courses() {
       setEditCode("");
 
       fetchCourses();
-      showSuccessMessage("Course updated successfully");
+      showSuccessMessage(t.courseUpdatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not update course");
+      showErrorMessage(t.couldNotUpdateCourse);
     }
   };
 
@@ -199,8 +203,13 @@ function Courses() {
 
       <main className="page">
         <section className="page-header">
-          <h1>Courses</h1>
-          {user && <p>Welcome, {user.username}</p>}
+          <h1>{t.courses}</h1>
+
+          {user && (
+            <p>
+              {t.welcome}, {user.username}
+            </p>
+          )}
         </section>
 
         <NotificationBanner
@@ -209,25 +218,25 @@ function Courses() {
         />
 
         <section className="card">
-          <h2>Create Course</h2>
+          <h2>{t.createCourse}</h2>
 
           <form onSubmit={handleCreateCourse} className="form">
             <input
               type="text"
-              placeholder="Course name"
+              placeholder={t.courseName}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
 
             <input
               type="text"
-              placeholder="Course code"
+              placeholder={t.courseCode}
               value={code}
               onChange={(e) => setCode(e.target.value)}
             />
 
             <div>
-              <label>Course color</label>
+              <label>{t.courseColor}</label>
 
               <div className="color-picker-row">
                 <input
@@ -241,17 +250,17 @@ function Courses() {
               </div>
             </div>
 
-            <button type="submit">Add Course</button>
+            <button type="submit">{t.addCourse}</button>
           </form>
         </section>
 
         <section className="card">
           <div className="section-header">
-            <h2>Your Courses</h2>
+            <h2>{t.yourCourses}</h2>
 
             <input
               type="text"
-              placeholder="Search courses..."
+              placeholder={t.searchCourses}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -260,8 +269,8 @@ function Courses() {
 
           {filteredCourses.length === 0 ? (
             <div className="empty-state">
-              <h3>📚 No courses yet</h3>
-              <p>Create your first course to start organizing your studies.</p>
+              <h3>📚 {t.noCoursesYet}</h3>
+              <p>{t.createFirstCourse}</p>
             </div>
           ) : (
             filteredCourses.map((course) => (
@@ -282,7 +291,7 @@ function Courses() {
 
                     <div className="actions">
                       <button onClick={() => handleEditCourse(course._id)}>
-                        Save
+                        {t.save}
                       </button>
 
                       <button
@@ -290,7 +299,7 @@ function Courses() {
                         className="secondary-button"
                         onClick={() => setEditingCourseId(null)}
                       >
-                        Cancel
+                        {t.cancel}
                       </button>
                     </div>
                   </div>
@@ -317,7 +326,7 @@ function Courses() {
                           setEditCode(course.code);
                         }}
                       >
-                        Edit
+                        {t.edit}
                       </button>
 
                       <button
@@ -327,7 +336,7 @@ function Courses() {
                           setShowDeleteModal(true);
                         }}
                       >
-                        Delete
+                        {t.delete}
                       </button>
                     </div>
                   </>
@@ -339,8 +348,8 @@ function Courses() {
 
         <ConfirmModal
           isOpen={showDeleteModal}
-          title="Delete course?"
-          message="Are you sure you want to delete this course? This action cannot be undone."
+          title={t.deleteCourseTitle}
+          message={t.deleteCourseMessage}
           onCancel={() => {
             setShowDeleteModal(false);
             setCourseToDelete(null);

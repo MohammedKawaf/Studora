@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
 import ConfirmModal from "../components/ConfirmModal";
+import translations from "../translations";
 
 function Grades() {
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
+
   const [grades, setGrades] = useState([]);
   const [courses, setCourses] = useState([]);
 
@@ -90,12 +94,12 @@ function Grades() {
     e.preventDefault();
 
     if (!course || !grade || !credits || !year || !term) {
-      showErrorMessage("Please fill in all fields");
+      showErrorMessage(t.pleaseFillAllFields);
       return;
     }
 
     if (Number(credits) <= 0) {
-      showErrorMessage("Credits must be greater than 0");
+      showErrorMessage(t.creditsMustBeGreaterThanZero);
       return;
     }
 
@@ -108,7 +112,7 @@ function Grades() {
     );
 
     if (existingGrade) {
-      showErrorMessage("This course already has a grade");
+      showErrorMessage(t.courseAlreadyHasGrade);
       return;
     }
 
@@ -139,10 +143,10 @@ function Grades() {
       setTerm("");
 
       fetchGrades();
-      showSuccessMessage("Grade added successfully");
+      showSuccessMessage(t.gradeAddedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not create grade");
+      showErrorMessage(t.couldNotCreateGrade);
     }
   };
 
@@ -164,21 +168,21 @@ function Grades() {
       setGradeToDelete(null);
 
       fetchGrades();
-      showSuccessMessage("Grade deleted successfully");
+      showSuccessMessage(t.gradeDeletedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not delete grade");
+      showErrorMessage(t.couldNotDeleteGrade);
     }
   };
 
   const handleEditGrade = async (gradeId) => {
     if (!editGrade || !editCredits || !editYear || !editTerm) {
-      showErrorMessage("Please fill in all fields");
+      showErrorMessage(t.pleaseFillAllFields);
       return;
     }
 
     if (Number(editCredits) <= 0) {
-      showErrorMessage("Credits must be greater than 0");
+      showErrorMessage(t.creditsMustBeGreaterThanZero);
       return;
     }
 
@@ -213,10 +217,10 @@ function Grades() {
       setEditTerm("");
 
       fetchGrades();
-      showSuccessMessage("Grade updated successfully");
+      showSuccessMessage(t.gradeUpdatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not update grade");
+      showErrorMessage(t.couldNotUpdateGrade);
     }
   };
 
@@ -286,7 +290,8 @@ function Grades() {
   const gradeChartData = gradeChartLabels.map((gradeLabel) => {
     return {
       label: gradeLabel,
-      count: grades.filter((gradeItem) => gradeItem.grade === gradeLabel).length,
+      count: grades.filter((gradeItem) => gradeItem.grade === gradeLabel)
+        .length,
     };
   });
 
@@ -329,8 +334,8 @@ function Grades() {
 
       <main className="page">
         <section className="page-header">
-          <h1>Grades</h1>
-          <p>Track your grades, credits and study progress.</p>
+          <h1>{t.grades}</h1>
+          <p>{t.gradesSubtitle}</p>
         </section>
 
         <NotificationBanner
@@ -339,43 +344,45 @@ function Grades() {
         />
 
         <section className="card">
-          <h2>Grade Overview</h2>
+          <h2>{t.gradeOverview}</h2>
 
           <div className="overview-grid">
             <div className="overview-card">
-              <h3>Total Credits</h3>
-              <p>{totalCredits} / {creditGoal} hp</p>
+              <h3>{t.totalCredits}</h3>
+              <p>
+                {totalCredits} / {creditGoal} hp
+              </p>
             </div>
 
             <div className="overview-card">
-              <h3>Passed Courses</h3>
+              <h3>{t.passedCourses}</h3>
               <p>{passedGrades.length}</p>
             </div>
 
             <div className="overview-card">
-              <h3>Failed Courses</h3>
+              <h3>{t.failedCourses}</h3>
               <p>{failedGrades.length}</p>
             </div>
 
             <div className="overview-card">
-              <h3>{hasNumericGrades ? "Average Score" : "Average Grade"}</h3>
+              <h3>{hasNumericGrades ? t.averageScore : t.averageGrade}</h3>
               <p>{averageGrade}</p>
             </div>
 
             <div className="overview-card">
-              <h3>Total Courses</h3>
+              <h3>{t.totalCourses}</h3>
               <p>{totalCourses}</p>
             </div>
           </div>
         </section>
 
         <section className="card grade-chart-card">
-          <h2>Grade Chart</h2>
+          <h2>{t.gradeChart}</h2>
 
           {grades.length === 0 ? (
             <div className="empty-state">
-              <h3>📊 No grade data yet</h3>
-              <p>Add grades to see your grade distribution.</p>
+              <h3>📊 {t.noGradeDataYet}</h3>
+              <p>{t.addGradesToSeeDistribution}</p>
             </div>
           ) : (
             <div className="grade-chart">
@@ -400,11 +407,11 @@ function Grades() {
         </section>
 
         <section className="card">
-          <h2>Add Grade</h2>
+          <h2>{t.addGrade}</h2>
 
           <form onSubmit={handleCreateGrade} className="form">
             <select value={course} onChange={(e) => setCourse(e.target.value)}>
-              <option value="">Select course</option>
+              <option value="">{t.selectCourse}</option>
 
               {courses.map((courseItem) => (
                 <option key={courseItem._id} value={courseItem._id}>
@@ -414,7 +421,7 @@ function Grades() {
             </select>
 
             <select value={grade} onChange={(e) => setGrade(e.target.value)}>
-              <option value="">Select grade</option>
+              <option value="">{t.selectGrade}</option>
               <option value="U">U</option>
               <option value="G">G</option>
               <option value="VG">VG</option>
@@ -427,37 +434,37 @@ function Grades() {
             <input
               type="number"
               step="0.5"
-              placeholder="Credits / HP"
+              placeholder={t.creditsHp}
               value={credits}
               onChange={(e) => setCredits(e.target.value)}
             />
 
             <select value={year} onChange={(e) => setYear(e.target.value)}>
-              <option value="">Select year</option>
-              <option value="1">Year 1</option>
-              <option value="2">Year 2</option>
-              <option value="3">Year 3</option>
-              <option value="4">Year 4</option>
-              <option value="5">Year 5</option>
+              <option value="">{t.selectYear}</option>
+              <option value="1">{t.year} 1</option>
+              <option value="2">{t.year} 2</option>
+              <option value="3">{t.year} 3</option>
+              <option value="4">{t.year} 4</option>
+              <option value="5">{t.year} 5</option>
             </select>
 
             <select value={term} onChange={(e) => setTerm(e.target.value)}>
-              <option value="">Select term</option>
-              <option value="1">Term 1</option>
-              <option value="2">Term 2</option>
+              <option value="">{t.selectTerm}</option>
+              <option value="1">{t.term} 1</option>
+              <option value="2">{t.term} 2</option>
             </select>
 
-            <button type="submit">Add Grade</button>
+            <button type="submit">{t.addGrade}</button>
           </form>
         </section>
 
         <section className="card">
-          <h2>Your Grades</h2>
+          <h2>{t.yourGrades}</h2>
 
           <div className="calendar-filters">
             <input
               type="text"
-              placeholder="Search grades..."
+              placeholder={t.searchGrades}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -466,28 +473,28 @@ function Grades() {
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
             >
-              <option value="">All Years</option>
-              <option value="1">Year 1</option>
-              <option value="2">Year 2</option>
-              <option value="3">Year 3</option>
-              <option value="4">Year 4</option>
-              <option value="5">Year 5</option>
+              <option value="">{t.allYears}</option>
+              <option value="1">{t.year} 1</option>
+              <option value="2">{t.year} 2</option>
+              <option value="3">{t.year} 3</option>
+              <option value="4">{t.year} 4</option>
+              <option value="5">{t.year} 5</option>
             </select>
 
             <select
               value={selectedTerm}
               onChange={(e) => setSelectedTerm(e.target.value)}
             >
-              <option value="">All Terms</option>
-              <option value="1">Term 1</option>
-              <option value="2">Term 2</option>
+              <option value="">{t.allTerms}</option>
+              <option value="1">{t.term} 1</option>
+              <option value="2">{t.term} 2</option>
             </select>
 
             <select
               value={selectedGrade}
               onChange={(e) => setSelectedGrade(e.target.value)}
             >
-              <option value="">All Grades</option>
+              <option value="">{t.allGrades}</option>
               <option value="U">U</option>
               <option value="G">G</option>
               <option value="VG">VG</option>
@@ -500,8 +507,8 @@ function Grades() {
 
           {filteredGrades.length === 0 ? (
             <div className="empty-state">
-              <h3>📈 No grades yet</h3>
-              <p>Add your grades to track your study progress.</p>
+              <h3>📈 {t.noGradesYet}</h3>
+              <p>{t.addGradesToTrackProgress}</p>
             </div>
           ) : (
             filteredGrades.map((gradeItem) => (
@@ -532,31 +539,31 @@ function Grades() {
                       value={editYear}
                       onChange={(e) => setEditYear(e.target.value)}
                     >
-                      <option value="1">Year 1</option>
-                      <option value="2">Year 2</option>
-                      <option value="3">Year 3</option>
-                      <option value="4">Year 4</option>
-                      <option value="5">Year 5</option>
+                      <option value="1">{t.year} 1</option>
+                      <option value="2">{t.year} 2</option>
+                      <option value="3">{t.year} 3</option>
+                      <option value="4">{t.year} 4</option>
+                      <option value="5">{t.year} 5</option>
                     </select>
 
                     <select
                       value={editTerm}
                       onChange={(e) => setEditTerm(e.target.value)}
                     >
-                      <option value="1">Term 1</option>
-                      <option value="2">Term 2</option>
+                      <option value="1">{t.term} 1</option>
+                      <option value="2">{t.term} 2</option>
                     </select>
 
                     <div className="actions">
                       <button onClick={() => handleEditGrade(gradeItem._id)}>
-                        Save
+                        {t.save}
                       </button>
 
                       <button
                         className="secondary-button"
                         onClick={() => setEditingGradeId(null)}
                       >
-                        Cancel
+                        {t.cancel}
                       </button>
                     </div>
                   </div>
@@ -564,10 +571,14 @@ function Grades() {
                   <>
                     <div>
                       <h3>{gradeItem.title}</h3>
-                      <p>Grade: {gradeItem.grade}</p>
-                      <p>Credits: {gradeItem.credits} hp</p>
                       <p>
-                        Year {gradeItem.year}, Term {gradeItem.term}
+                        {t.grade}: {gradeItem.grade}
+                      </p>
+                      <p>
+                        {t.credits}: {gradeItem.credits} hp
+                      </p>
+                      <p>
+                        {t.year} {gradeItem.year}, {t.term} {gradeItem.term}
                       </p>
 
                       {gradeItem.course && (
@@ -595,7 +606,7 @@ function Grades() {
                           setEditTerm(gradeItem.term);
                         }}
                       >
-                        Edit
+                        {t.edit}
                       </button>
 
                       <button
@@ -605,7 +616,7 @@ function Grades() {
                           setShowDeleteModal(true);
                         }}
                       >
-                        Delete
+                        {t.delete}
                       </button>
                     </div>
                   </>
@@ -617,15 +628,14 @@ function Grades() {
 
         <ConfirmModal
           isOpen={showDeleteModal}
-          title="Delete grade?"
-          message="Are you sure you want to delete this grade? This action cannot be undone."
+          title={t.deleteGradeTitle}
+          message={t.deleteGradeMessage}
           onCancel={() => {
             setShowDeleteModal(false);
             setGradeToDelete(null);
           }}
           onConfirm={handleDeleteGrade}
         />
-        
       </main>
     </div>
   );

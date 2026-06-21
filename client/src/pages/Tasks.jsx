@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
 import ConfirmModal from "../components/ConfirmModal";
+import translations from "../translations";
 
 function Tasks() {
+  const language = localStorage.getItem("language") || "en";
+  const t = translations[language];
+
   const [tasks, setTasks] = useState([]);
   const [courses, setCourses] = useState([]);
 
@@ -86,7 +90,7 @@ function Tasks() {
     e.preventDefault();
 
     if (!title.trim() || !course || !dueDate) {
-      showErrorMessage("Please fill in all fields");
+      showErrorMessage(t.pleaseFillAllFields);
       return;
     }
 
@@ -95,7 +99,7 @@ function Tasks() {
     today.setHours(0, 0, 0, 0);
 
     if (selectedDueDate < today) {
-      showErrorMessage("Due date cannot be in the past");
+      showErrorMessage(t.dueDateCannotBePast);
       return;
     }
 
@@ -121,10 +125,10 @@ function Tasks() {
       setDueDate("");
 
       fetchTasks();
-      showSuccessMessage("Task created successfully");
+      showSuccessMessage(t.taskCreatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not create task");
+      showErrorMessage(t.couldNotCreateTask);
     }
   };
 
@@ -145,11 +149,11 @@ function Tasks() {
       fetchTasks();
 
       showSuccessMessage(
-        completed ? "Task marked as incomplete" : "Task marked as completed"
+        completed ? t.taskMarkedIncomplete : t.taskMarkedCompleted
       );
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not update task");
+      showErrorMessage(t.couldNotUpdateTask);
     }
   };
 
@@ -171,16 +175,16 @@ function Tasks() {
       setTaskToDelete(null);
 
       fetchTasks();
-      showSuccessMessage("Task deleted successfully");
+      showSuccessMessage(t.taskDeletedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not delete task");
+      showErrorMessage(t.couldNotDeleteTask);
     }
   };
 
   const handleEditTask = async (taskId) => {
     if (!editTitle.trim() || !editCourse || !editDueDate) {
-      showErrorMessage("Please fill in all fields");
+      showErrorMessage(t.pleaseFillAllFields);
       return;
     }
 
@@ -207,10 +211,10 @@ function Tasks() {
       setEditDueDate("");
 
       fetchTasks();
-      showSuccessMessage("Task updated successfully");
+      showSuccessMessage(t.taskUpdatedSuccessfully);
     } catch (error) {
       console.log(error.response?.data || error.message);
-      showErrorMessage("Could not update task");
+      showErrorMessage(t.couldNotUpdateTask);
     }
   };
 
@@ -239,8 +243,8 @@ function Tasks() {
 
       <main className="page">
         <section className="page-header">
-          <h1>Tasks</h1>
-          <p>Track assignments, deadlines and study tasks.</p>
+          <h1>{t.tasks}</h1>
+          <p>{t.tasksSubtitle}</p>
         </section>
 
         <NotificationBanner
@@ -249,18 +253,18 @@ function Tasks() {
         />
 
         <section className="card">
-          <h2>Create Task</h2>
+          <h2>{t.createTask}</h2>
 
           <form onSubmit={handleCreateTask} className="form">
             <input
               type="text"
-              placeholder="Task title"
+              placeholder={t.taskTitle}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
 
             <select value={course} onChange={(e) => setCourse(e.target.value)}>
-              <option value="">Select course</option>
+              <option value="">{t.selectCourse}</option>
 
               {courses.map((courseItem) => (
                 <option key={courseItem._id} value={courseItem._id}>
@@ -275,17 +279,17 @@ function Tasks() {
               onChange={(e) => setDueDate(e.target.value)}
             />
 
-            <button type="submit">Add Task</button>
+            <button type="submit">{t.addTask}</button>
           </form>
         </section>
 
         <section className="card">
-          <h2>Your Tasks</h2>
+          <h2>{t.yourTasks}</h2>
 
           <div className="calendar-filters">
             <input
               type="text"
-              placeholder="Search tasks..."
+              placeholder={t.searchTasks}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -294,7 +298,7 @@ function Tasks() {
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
             >
-              <option value="">All Courses</option>
+              <option value="">{t.allCourses}</option>
 
               {courses.map((courseItem) => (
                 <option key={courseItem._id} value={courseItem._id}>
@@ -307,16 +311,16 @@ function Tasks() {
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
             >
-              <option value="">All Statuses</option>
-              <option value="completed">Completed</option>
-              <option value="not-completed">Not completed</option>
+              <option value="">{t.allStatuses}</option>
+              <option value="completed">{t.completed}</option>
+              <option value="not-completed">{t.notCompleted}</option>
             </select>
           </div>
 
           {filteredTasks.length === 0 ? (
             <div className="empty-state">
-              <h3>📋 No tasks yet</h3>
-              <p>Add tasks and deadlines to stay organized.</p>
+              <h3>📋 {t.noTasksYet}</h3>
+              <p>{t.addTasksToStayOrganized}</p>
             </div>
           ) : (
             filteredTasks.map((task) => (
@@ -338,7 +342,7 @@ function Tasks() {
                       value={editCourse}
                       onChange={(e) => setEditCourse(e.target.value)}
                     >
-                      <option value="">Select course</option>
+                      <option value="">{t.selectCourse}</option>
 
                       {courses.map((courseItem) => (
                         <option key={courseItem._id} value={courseItem._id}>
@@ -355,14 +359,14 @@ function Tasks() {
 
                     <div className="actions">
                       <button onClick={() => handleEditTask(task._id)}>
-                        Save
+                        {t.save}
                       </button>
 
                       <button
                         className="secondary-button"
                         onClick={() => setEditingTaskId(null)}
                       >
-                        Cancel
+                        {t.cancel}
                       </button>
                     </div>
                   </div>
@@ -392,15 +396,15 @@ function Tasks() {
 
                       {task.dueDate && (
                         <p>
-                          Due date:{" "}
+                          {t.dueDate}:{" "}
                           {new Date(task.dueDate).toLocaleDateString()}
                         </p>
                       )}
 
                       <p>
-                        Status:{" "}
+                        {t.status}:{" "}
                         <strong>
-                          {task.completed ? "Completed" : "Not completed"}
+                          {task.completed ? t.completed : t.notCompleted}
                         </strong>
                       </p>
                     </div>
@@ -412,8 +416,8 @@ function Tasks() {
                         }
                       >
                         {task.completed
-                          ? "Mark as incomplete"
-                          : "Mark as completed"}
+                          ? t.markAsIncomplete
+                          : t.markAsCompleted}
                       </button>
 
                       <button
@@ -431,7 +435,7 @@ function Tasks() {
                           );
                         }}
                       >
-                        Edit
+                        {t.edit}
                       </button>
 
                       <button
@@ -441,7 +445,7 @@ function Tasks() {
                           setShowDeleteModal(true);
                         }}
                       >
-                        Delete
+                        {t.delete}
                       </button>
                     </div>
                   </>
@@ -453,8 +457,8 @@ function Tasks() {
 
         <ConfirmModal
           isOpen={showDeleteModal}
-          title="Delete task?"
-          message="Are you sure you want to delete this task? This action cannot be undone."
+          title={t.deleteTaskTitle}
+          message={t.deleteTaskMessage}
           onCancel={() => {
             setShowDeleteModal(false);
             setTaskToDelete(null);
