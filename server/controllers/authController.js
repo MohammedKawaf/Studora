@@ -245,10 +245,10 @@ const uploadProfileImage = async (req, res) => {
 
     user.profileImage = `/uploads/${req.file.filename}`;
 
-    await user.save();
+    const updatedUser = await user.save();
 
     res.status(200).json({
-      profileImage: user.profileImage,
+      profileImage: updatedUser.profileImage,
       message: "Profile image uploaded successfully",
     });
   } catch (error) {

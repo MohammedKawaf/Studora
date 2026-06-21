@@ -32,12 +32,7 @@ router.post(
   "/upload-profile-image",
   protect,
   upload.single("profileImage"),
-  (req, res) => {
-    res.status(200).json({
-      message: "Upload route works",
-      file: req.file,
-    });
-  }
+  uploadProfileImage
 );
 
 module.exports = router;

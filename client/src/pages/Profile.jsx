@@ -323,6 +323,51 @@ function Profile() {
     }
   };
 
+  const handleSaveProfilePicture = async () => {
+    if (!profilePictureFile) {
+      showErrorMessage("Please select an image");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const formData = new FormData();
+
+      formData.append(
+        "profileImage",
+        profilePictureFile
+      );
+
+      const response = await api.post(
+        "/auth/upload-profile-image",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setUser({
+        ...user,
+        profileImage: response.data.profileImage,
+      });
+
+      setShowProfilePictureModal(false);
+
+      showSuccessMessage(
+        "Profile image uploaded successfully"
+      );
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+
+      showErrorMessage(
+        "Could not upload profile image"
+      );
+    }
+  };
 
   return (
     <div>
@@ -342,7 +387,15 @@ function Profile() {
         {user && (
           <section className="card profile-card">
             <div className="profile-avatar">
-              {user.username.charAt(0).toUpperCase()}
+              {user.profileImage ? (
+                <img
+                  src={`http://localhost:5000${user.profileImage}`}
+                  alt="Profile"
+                  className="profile-avatar-image"
+                />
+              ) : (
+                user.username.charAt(0).toUpperCase()
+              )}
             </div>
 
             <h2>{user.username}</h2>
@@ -752,7 +805,7 @@ function Profile() {
                   Cancel
                 </button>
 
-                <button>
+                <button onClick={handleSaveProfilePicture}>
                   Save Picture
                 </button>
               </div>
