@@ -15,6 +15,7 @@ function Notes() {
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
+  const [autosaveStatus, setAutosaveStatus] = useState("");
 
   const [selectedCourse, setSelectedCourse] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -176,6 +177,52 @@ function Notes() {
     }
   };
 
+  const handleAutosaveNote = async (noteId, updatedTitle, updatedContent) => {
+    if (!updatedTitle.trim() || !updatedContent.trim()) {
+      return;
+    }
+
+    try {
+      setAutosaveStatus("Saving...");
+
+      const token = localStorage.getItem("token");
+
+      await api.put(
+        `/notes/${noteId}`,
+        {
+          title: updatedTitle.trim(),
+          content: updatedContent.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setAutosaveStatus("Saved automatically");
+
+      setTimeout(() => {
+        setAutosaveStatus("");
+      }, 2000);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      setAutosaveStatus("Autosave failed");
+    }
+  };
+
+  useEffect(() => {
+    if (!editingNoteId) {
+      return;
+    }
+
+    const autosaveTimer = setTimeout(() => {
+      handleAutosaveNote(editingNoteId, editTitle, editContent);
+    }, 1000);
+
+    return () => clearTimeout(autosaveTimer);
+  }, [editingNoteId, editTitle, editContent]);
+
   const filteredNotes = notes.filter((note) => {
     const matchesCourse = selectedCourse
       ? note.course?._id === selectedCourse
@@ -279,6 +326,10 @@ function Notes() {
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
                     />
+
+                    {autosaveStatus && (
+                      <p className="autosave-status">{autosaveStatus}</p>
+                    )}
 
                     <div className="actions">
                       <button onClick={() => handleEditNote(note._id)}>
