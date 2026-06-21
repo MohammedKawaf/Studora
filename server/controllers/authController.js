@@ -258,6 +258,31 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
+const removeProfileImage = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    user.profileImage = "";
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      profileImage: updatedUser.profileImage,
+      message: "Profile image removed successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -265,4 +290,5 @@ module.exports = {
   changePassword,
   deleteAccount,
   uploadProfileImage, 
+  removeProfileImage,
 };

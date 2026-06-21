@@ -369,6 +369,28 @@ function Profile() {
     }
   };
 
+  const handleRemoveProfileImage = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.delete("/auth/remove-profile-image", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUser({
+        ...user,
+        profileImage: response.data.profileImage,
+      });
+
+      showSuccessMessage("Profile image removed successfully");
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      showErrorMessage("Could not remove profile image");
+    }
+  };
+
   return (
     <div>
       <Navbar user={true} />
@@ -401,7 +423,20 @@ function Profile() {
             <h2>{user.username}</h2>
             <p>{user.email}</p>
 
-            <button onClick={handleProfilePicture}>Add Profile Picture</button>
+            <div className="actions" style={{ justifyContent: "center" }}>
+              <button onClick={handleProfilePicture}>
+                {user.profileImage ? "Change Profile Picture" : "Add Profile Picture"}
+              </button>
+
+              {user.profileImage && (
+                <button
+                  className="danger-button"
+                  onClick={handleRemoveProfileImage}
+                >
+                  Remove Picture
+                </button>
+              )}
+            </div>
           </section>
         )}
 

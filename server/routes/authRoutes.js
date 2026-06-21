@@ -9,6 +9,7 @@ const {
   changePassword,
   deleteAccount,
   uploadProfileImage,
+  removeProfileImage,
 } = require("../controllers/authController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -33,6 +34,12 @@ router.post(
   protect,
   upload.single("profileImage"),
   uploadProfileImage
+);
+
+router.delete(
+  "/remove-profile-image",
+  protect,
+  removeProfileImage
 );
 
 module.exports = router;
