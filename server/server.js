@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const taskRoutes = require("./routes/taskRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const gradeRoutes = require("./routes/gradeRoutes");
+const friendRoutes = require("./routes/friendRoutes");
 
 dotenv.config();
 connectDB();
@@ -24,6 +25,7 @@ app.use("/api/notes", require("./routes/noteRoutes"));
 app.use("/api/tasks", taskRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/grades", gradeRoutes);
+app.use("/api/friends", friendRoutes);
 
 app.get("/", (req, res) => {
   res.send("Studora API is running");
