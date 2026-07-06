@@ -22,6 +22,7 @@ function Navbar({ user }) {
           <Link to="/tasks">{t.tasks}</Link>{" "}
           <Link to="/calendar">{t.calendar}</Link>{" "}
           <Link to="/grades">{t.grades}</Link>{" "}
+          <Link to="/friends">{t.friends}</Link>{" "}
           <Link to="/profile">{t.profile}</Link>{" "}
         </>
       )}

@@ -6,6 +6,7 @@ const translations = {
     tasks: "Tasks",
     calendar: "Calendar",
     grades: "Grades",
+    friends: "Friends",
     profile: "Profile",
     login: "Login",
     register: "Register",
@@ -325,6 +326,7 @@ const translations = {
     tasks: "Uppgifter",
     calendar: "Kalender",
     grades: "Betyg",
+    friends: "Vänner",
     profile: "Profil",
     login: "Logga in",
     register: "Registrera",
@@ -636,4 +638,4 @@ const translations = {
     updatePassword: "Uppdatera lösenord",
     },
     };
-export default translations;
+export default translations;907

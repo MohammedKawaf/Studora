@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import Grades from "./pages/Grades";
+import Friends from "./pages/Friends";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -97,6 +98,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Grades />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/friends"
+          element={
+            <ProtectedRoute>
+              <Friends />
             </ProtectedRoute>
           }
         />
