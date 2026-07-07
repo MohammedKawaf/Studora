@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../services/api";
 import NotificationBanner from "../components/NotificationBanner";
 import translations from "../translations";
@@ -11,6 +11,9 @@ function Friends() {
   const [searchTerm, setSearchTerm] = useState("");
   const [students, setStudents] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
+
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [friends, setFriends] = useState([]);
 
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -32,6 +35,43 @@ function Friends() {
       setErrorMessage("");
     }, 3000);
   };
+
+  const fetchFriendRequests = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.get("/friends/requests", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setFriendRequests(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  const fetchFriends = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.get("/friends", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setFriends(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchFriendRequests();
+    fetchFriends();
+  }, []);
 
   const handleSearchStudents = async (e) => {
     const value = e.target.value;
@@ -86,6 +126,94 @@ function Friends() {
     }
   };
 
+  const handleAcceptFriendRequest = async (requestId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.post(
+        `/friends/accept/${requestId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchFriendRequests();
+      fetchFriends();
+
+      showSuccessMessage(t.friendRequestAccepted);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      showErrorMessage(t.couldNotAcceptFriendRequest);
+    }
+  };
+
+  const handleDeclineFriendRequest = async (requestId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.post(
+        `/friends/decline/${requestId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchFriendRequests();
+
+      showSuccessMessage(t.friendRequestDeclined);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      showErrorMessage(t.couldNotDeclineFriendRequest);
+    }
+  };
+
+  const renderUserCard = (person) => {
+    return (
+      <div className="course-info">
+        <div className="profile-avatar small-avatar">
+          {person.profileImage ? (
+            <img
+              src={`http://localhost:5000${person.profileImage}`}
+              alt={person.username}
+              className="profile-avatar-image"
+            />
+          ) : (
+            person.username.charAt(0).toUpperCase()
+          )}
+        </div>
+
+        <div>
+          <h3>{person.username}</h3>
+          <p>{person.email}</p>
+
+          {person.school && (
+            <p>
+              {t.school}: {person.school}
+            </p>
+          )}
+
+          {person.program && (
+            <p>
+              {t.program}: {person.program}
+            </p>
+          )}
+
+          {person.studyYear && (
+            <p>
+              {t.studyYear}: {t.year} {person.studyYear}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       <Navbar user={true} />
@@ -121,42 +249,7 @@ function Friends() {
 
           {students.map((student) => (
             <div key={student._id} className="list-item">
-              <div className="course-info">
-                <div className="profile-avatar small-avatar">
-                  {student.profileImage ? (
-                    <img
-                      src={`http://localhost:5000${student.profileImage}`}
-                      alt={student.username}
-                      className="profile-avatar-image"
-                    />
-                  ) : (
-                    student.username.charAt(0).toUpperCase()
-                  )}
-                </div>
-
-                <div>
-                  <h3>{student.username}</h3>
-                  <p>{student.email}</p>
-
-                  {student.school && (
-                    <p>
-                      {t.school}: {student.school}
-                    </p>
-                  )}
-
-                  {student.program && (
-                    <p>
-                      {t.program}: {student.program}
-                    </p>
-                  )}
-
-                  {student.studyYear && (
-                    <p>
-                      {t.studyYear}: {t.year} {student.studyYear}
-                    </p>
-                  )}
-                </div>
-              </div>
+              {renderUserCard(student)}
 
               <div className="actions">
                 <button
@@ -174,12 +267,49 @@ function Friends() {
 
         <section className="card">
           <h2>{t.friendRequests}</h2>
-          <p>{t.incomingFriendRequestsPlaceholder}</p>
+
+          {friendRequests.length === 0 ? (
+            <div className="empty-state">
+              <h3>📩 {t.noFriendRequests}</h3>
+              <p>{t.noFriendRequestsDescription}</p>
+            </div>
+          ) : (
+            friendRequests.map((request) => (
+              <div key={request._id} className="list-item">
+                {renderUserCard(request.sender)}
+
+                <div className="actions">
+                  <button onClick={() => handleAcceptFriendRequest(request._id)}>
+                    {t.accept}
+                  </button>
+
+                  <button
+                    className="danger-button"
+                    onClick={() => handleDeclineFriendRequest(request._id)}
+                  >
+                    {t.decline}
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </section>
 
         <section className="card">
           <h2>{t.yourFriends}</h2>
-          <p>{t.friendsListPlaceholder}</p>
+
+          {friends.length === 0 ? (
+            <div className="empty-state">
+              <h3>👥 {t.noFriendsYet}</h3>
+              <p>{t.noFriendsYetDescription}</p>
+            </div>
+          ) : (
+            friends.map((friend) => (
+              <div key={friend._id} className="list-item">
+                {renderUserCard(friend)}
+              </div>
+            ))
+          )}
         </section>
       </main>
     </div>

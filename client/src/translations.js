@@ -333,6 +333,17 @@ const translations = {
     friendRequestSent: "Friend request sent successfully",
     couldNotSendFriendRequest: "Could not send friend request",
     requestSent: "Request Sent",
+
+    friendRequestAccepted: "Friend request accepted",
+    friendRequestDeclined: "Friend request declined",
+    couldNotAcceptFriendRequest: "Could not accept friend request",
+    couldNotDeclineFriendRequest: "Could not decline friend request",
+    accept: "Accept",
+    decline: "Decline",
+    noFriendRequests: "No friend requests",
+    noFriendRequestsDescription: "Incoming friend requests will appear here.",
+    noFriendsYet: "No friends yet",
+    noFriendsYetDescription: "Search for students and send friend requests to build your friend list.",
     },
 
   sv: {
@@ -668,6 +679,17 @@ const translations = {
     friendRequestSent: "Vänförfrågan skickad",
     couldNotSendFriendRequest: "Kunde inte skicka vänförfrågan",
     requestSent: "Förfrågan skickad",
+    friendRequestAccepted: "Vänförfrågan accepterad",
+
+    friendRequestDeclined: "Vänförfrågan nekad",
+    couldNotAcceptFriendRequest: "Kunde inte acceptera vänförfrågan",
+    couldNotDeclineFriendRequest: "Kunde inte neka vänförfrågan",
+    accept: "Acceptera",
+    decline: "Neka",
+    noFriendRequests: "Inga vänförfrågningar",
+    noFriendRequestsDescription: "Inkommande vänförfrågningar visas här.",
+    noFriendsYet: "Inga vänner än",
+    noFriendsYetDescription: "Sök efter studenter och skicka vänförfrågningar för att bygga din vänlista.",
     },
     };
 export default translations;907
