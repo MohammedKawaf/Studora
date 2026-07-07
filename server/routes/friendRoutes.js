@@ -8,11 +8,14 @@ const {
   acceptFriendRequest,
   declineFriendRequest,
   getFriends,
+  searchUsers,
 } = require("../controllers/friendController");
 
 const { protect } = require("../middleware/authMiddleware");
 
 router.post("/request", protect, sendFriendRequest);
+
+router.get("/search", protect, searchUsers);
 
 router.get("/requests", protect, getFriendRequests);
 

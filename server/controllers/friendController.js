@@ -180,10 +180,37 @@ const getFriends = async (req, res) => {
   }
 };
 
+const searchUsers = async (req, res) => {
+  try {
+    const searchTerm = req.query.search || "";
+
+    if (!searchTerm.trim()) {
+      return res.status(200).json([]);
+    }
+
+    const users = await User.find({
+      _id: { $ne: req.user._id },
+      $or: [
+        { username: { $regex: searchTerm, $options: "i" } },
+        { email: { $regex: searchTerm, $options: "i" } },
+        { school: { $regex: searchTerm, $options: "i" } },
+        { program: { $regex: searchTerm, $options: "i" } },
+      ],
+    }).select("username email school program studyYear profileImage lastActive");
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   sendFriendRequest,
   getFriendRequests,
   acceptFriendRequest,
   declineFriendRequest,
   getFriends,
+  searchUsers,
 };
