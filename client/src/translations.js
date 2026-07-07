@@ -344,6 +344,14 @@ const translations = {
     noFriendRequestsDescription: "Incoming friend requests will appear here.",
     noFriendsYet: "No friends yet",
     noFriendsYetDescription: "Search for students and send friend requests to build your friend list.",
+
+    chat: "Chat",
+    chatSubtitle: "Send direct messages to your friends.",
+    directMessages: "Direct Messages",
+    chatPlaceholder: "Your conversations will be shown here.",
+
+    selectFriendToChat: "Select a friend to start chatting.",
+    noMessagesYet: "No messages yet.",
     },
 
   sv: {
@@ -690,6 +698,14 @@ const translations = {
     noFriendRequestsDescription: "Inkommande vänförfrågningar visas här.",
     noFriendsYet: "Inga vänner än",
     noFriendsYetDescription: "Sök efter studenter och skicka vänförfrågningar för att bygga din vänlista.",
+
+    chat: "Chatt",
+    chatSubtitle: "Skicka direktmeddelanden till dina vänner.",
+    directMessages: "Direktmeddelanden",
+    chatPlaceholder: "Dina konversationer visas här.",
+
+    selectFriendToChat: "Välj en vän för att börja chatta.",
+    noMessagesYet: "Inga meddelanden än.",
     },
     };
 export default translations;907

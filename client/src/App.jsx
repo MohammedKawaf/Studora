@@ -11,6 +11,7 @@ import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import Grades from "./pages/Grades";
 import Friends from "./pages/Friends";
+import Chat from "./pages/Chat";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -107,6 +108,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Friends />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Chat />
             </ProtectedRoute>
           }
         />
