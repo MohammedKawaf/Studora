@@ -317,6 +317,22 @@ const translations = {
     newPassword: "New password",
     confirmNewPassword: "Confirm new password",
     updatePassword: "Update Password",
+
+    friendsSubtitle: "Find students, manage friend requests and view your friends.",
+    searchStudents: "Search Students",
+    searchStudentsPlaceholder: "Search by username, email, school or program...",
+    noStudentsFound: "No students found",
+    tryAnotherSearch: "Try searching for another student.",
+    couldNotSearchStudents: "Could not search students",
+    addFriend: "Add Friend",
+    friendRequests: "Friend Requests",
+    incomingFriendRequestsPlaceholder: "Incoming friend requests will be shown here.",
+    yourFriends: "Your Friends",
+    friendsListPlaceholder: "Your friend list will be shown here.",
+
+    friendRequestSent: "Friend request sent successfully",
+    couldNotSendFriendRequest: "Could not send friend request",
+    requestSent: "Request Sent",
     },
 
   sv: {
@@ -636,6 +652,22 @@ const translations = {
     newPassword: "Nytt lösenord",
     confirmNewPassword: "Bekräfta nytt lösenord",
     updatePassword: "Uppdatera lösenord",
+
+    friendsSubtitle: "Hitta studenter, hantera vänförfrågningar och se dina vänner.",
+    searchStudents: "Sök studenter",
+    searchStudentsPlaceholder: "Sök efter användarnamn, e-post, skola eller program...",
+    noStudentsFound: "Inga studenter hittades",
+    tryAnotherSearch: "Testa att söka efter en annan student.",
+    couldNotSearchStudents: "Kunde inte söka efter studenter",
+    addFriend: "Lägg till vän",
+    friendRequests: "Vänförfrågningar",
+    incomingFriendRequestsPlaceholder: "Inkommande vänförfrågningar visas här.",
+    yourFriends: "Dina vänner",
+    friendsListPlaceholder: "Din vänlista visas här.",
+
+    friendRequestSent: "Vänförfrågan skickad",
+    couldNotSendFriendRequest: "Kunde inte skicka vänförfrågan",
+    requestSent: "Förfrågan skickad",
     },
     };
 export default translations;907

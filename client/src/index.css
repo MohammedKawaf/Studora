@@ -844,3 +844,11 @@ body.dark-mode .password-rules {
 body.dark-mode .password-rules p {
   color: #f9fafb;
 }
+
+.small-avatar {
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
+  margin: 0;
+  flex-shrink: 0;
+}
