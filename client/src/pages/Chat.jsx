@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useRef, useState } from "react";
 import api from "../services/api";
 import translations from "../translations";
+import socket from "../services/socket";
 
 function Chat() {
   const language = localStorage.getItem("language") || "en";
@@ -88,6 +89,7 @@ function Chat() {
       );
 
       setMessages([...messages, response.data]);
+      socket.emit("sendMessage", response.data);
       setMessageContent("");
     } catch (error) {
       console.log(error.response?.data || error.message);
@@ -97,6 +99,16 @@ function Chat() {
   useEffect(() => {
     fetchFriends();
     fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    socket.on("receiveMessage", (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
   }, []);
 
   useEffect(() => {

@@ -43,6 +43,10 @@ app.use("/api/messages", messageRoutes);
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
+  socket.on("sendMessage", (message) => {
+    socket.broadcast.emit("receiveMessage", message);
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
