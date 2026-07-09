@@ -81,7 +81,57 @@ const getConversation = async (req, res) => {
   }
 };
 
+const getUnreadMessages = async (req, res) => {
+  try {
+    const unreadMessages = await Message.find({
+      receiver: req.user._id,
+      isRead: false,
+    });
+
+    const unreadCounts = {};
+
+    unreadMessages.forEach((message) => {
+      const senderId = message.sender.toString();
+
+      unreadCounts[senderId] = (unreadCounts[senderId] || 0) + 1;
+    });
+
+    res.status(200).json(unreadCounts);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const markMessagesAsRead = async (req, res) => {
+  try {
+    const friendId = req.params.friendId;
+
+    await Message.updateMany(
+      {
+        sender: friendId,
+        receiver: req.user._id,
+        isRead: false,
+      },
+      {
+        isRead: true,
+      }
+    );
+
+    res.status(200).json({
+      message: "Messages marked as read",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   sendMessage,
   getConversation,
+  getUnreadMessages,
+  markMessagesAsRead,
 };

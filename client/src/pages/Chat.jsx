@@ -15,6 +15,7 @@ function Chat() {
   const [currentUser, setCurrentUser] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [typingUser, setTypingUser] = useState("");
+  const [unreadCounts, setUnreadCounts] = useState({});
   const messagesEndRef = useRef(null);
 
   const fetchFriends = async () => {
@@ -44,6 +45,22 @@ function Chat() {
       });
 
       setCurrentUser(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  const fetchUnreadMessages = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.get("/messages/unread", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUnreadCounts(response.data);
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
@@ -79,6 +96,21 @@ function Chat() {
       });
 
       setMessages(response.data);
+
+      await api.put(
+        `/messages/read/${friend._id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setUnreadCounts((prevCounts) => ({
+        ...prevCounts,
+        [friend._id]: 0,
+      }));
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
@@ -145,17 +177,46 @@ function Chat() {
   useEffect(() => {
     fetchFriends();
     fetchCurrentUser();
+    fetchUnreadMessages();
   }, []);
 
   useEffect(() => {
-    socket.on("receiveMessage", (newMessage) => {
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    socket.on("receiveMessage", async (newMessage) => {
+      if (selectedFriend && newMessage.sender._id === selectedFriend._id) {
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+        try {
+          const token = localStorage.getItem("token");
+
+          await api.put(
+            `/messages/read/${selectedFriend._id}`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          setUnreadCounts((prevCounts) => ({
+            ...prevCounts,
+            [selectedFriend._id]: 0,
+          }));
+        } catch (error) {
+          console.log(error.response?.data || error.message);
+        }
+      } else {
+        setUnreadCounts((prevCounts) => ({
+          ...prevCounts,
+          [newMessage.sender._id]: (prevCounts[newMessage.sender._id] || 0) + 1,
+        }));
+      }
     });
 
     return () => {
       socket.off("receiveMessage");
     };
-  }, []);
+  }, [selectedFriend]);
 
   useEffect(() => {
     socket.on("userTyping", (data) => {
@@ -223,6 +284,12 @@ function Chat() {
                     <span>
                       {onlineUsers.includes(friend._id) ? "🟢 " : "⚪ "}
                       {friend.username}
+
+                      {unreadCounts[friend._id] > 0 && (
+                        <span className="unread-badge">
+                          {unreadCounts[friend._id]}
+                        </span>
+                      )}
                     </span>
                   </button>
                 ))
