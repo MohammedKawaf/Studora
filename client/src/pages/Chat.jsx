@@ -11,6 +11,7 @@ function Chat() {
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
 
   const fetchFriends = async () => {
     try {
@@ -23,6 +24,22 @@ function Chat() {
       });
 
       setFriends(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  const fetchCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.get("/auth/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setCurrentUser(response.data);
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
@@ -41,6 +58,7 @@ function Chat() {
       });
 
       setMessages(response.data);
+      console.log(response.data);
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
@@ -78,6 +96,7 @@ function Chat() {
 
   useEffect(() => {
     fetchFriends();
+    fetchCurrentUser();
   }, []);
 
   return (
@@ -135,12 +154,22 @@ function Chat() {
                     {messages.length === 0 ? (
                       <p>{t.noMessagesYet}</p>
                     ) : (
-                      messages.map((message) => (
-                        <div key={message._id} className="chat-message">
-                          <strong>{message.sender.username}: </strong>
-                          <span>{message.content}</span>
-                        </div>
-                      ))
+                      messages.map((message) => {
+                        const isMyMessage =
+                          currentUser &&
+                          message.sender._id === currentUser._id;
+
+                        return (
+                          <div
+                            key={message._id}
+                            className={`chat-message ${
+                              isMyMessage ? "my-message" : "friend-message"
+                            }`}
+                          >
+                            <span>{message.content}</span>
+                          </div>
+                        );
+                      })
                     )}
                   </div>
 

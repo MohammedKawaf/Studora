@@ -928,3 +928,34 @@ body.dark-mode .chat-message {
 .chat-form input {
   flex: 1;
 }
+
+.chat-messages {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-message {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  word-break: break-word;
+}
+
+.chat-message.my-message {
+  align-self: flex-end;
+  background-color: #2563eb;
+  color: white;
+}
+
+.chat-message.friend-message {
+  align-self: flex-start;
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+body.dark-mode .chat-message.friend-message {
+  background-color: #1e293b;
+  color: white;
+}
