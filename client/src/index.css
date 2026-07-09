@@ -918,3 +918,13 @@ body.dark-mode .chat-friend-button {
 body.dark-mode .chat-message {
   background-color: #1e293b;
 }
+
+.chat-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.chat-form input {
+  flex: 1;
+}

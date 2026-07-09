@@ -10,6 +10,7 @@ function Chat() {
   const [friends, setFriends] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [messageContent, setMessageContent] = useState("");
 
   const fetchFriends = async () => {
     try {
@@ -40,6 +41,36 @@ function Chat() {
       });
 
       setMessages(response.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+
+    if (!selectedFriend || !messageContent.trim()) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.post(
+        "/messages",
+        {
+          receiverId: selectedFriend._id,
+          content: messageContent.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setMessages([...messages, response.data]);
+      setMessageContent("");
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
@@ -112,6 +143,17 @@ function Chat() {
                       ))
                     )}
                   </div>
+
+                  <form onSubmit={handleSendMessage} className="chat-form">
+                    <input
+                      type="text"
+                      placeholder={t.writeMessage}
+                      value={messageContent}
+                      onChange={(e) => setMessageContent(e.target.value)}
+                    />
+
+                    <button type="submit">{t.send}</button>
+                  </form>
                 </>
               )}
             </div>

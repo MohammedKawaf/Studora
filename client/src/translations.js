@@ -352,6 +352,9 @@ const translations = {
 
     selectFriendToChat: "Select a friend to start chatting.",
     noMessagesYet: "No messages yet.",
+
+    writeMessage: "Write a message...",
+    send: "Send",
     },
 
   sv: {
@@ -706,6 +709,9 @@ const translations = {
 
     selectFriendToChat: "Välj en vän för att börja chatta.",
     noMessagesYet: "Inga meddelanden än.",
+
+    writeMessage: "Skriv ett meddelande...",
+    send: "Skicka",
     },
     };
 export default translations;907
