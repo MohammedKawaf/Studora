@@ -13,6 +13,7 @@ function Chat() {
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [typingUser, setTypingUser] = useState("");
   const messagesEndRef = useRef(null);
 
   const fetchFriends = async () => {
@@ -90,9 +91,36 @@ function Chat() {
 
       setMessages([...messages, response.data]);
       socket.emit("sendMessage", response.data);
+      socket.emit("stopTyping", {
+        senderId: currentUser._id,
+        receiverId: selectedFriend._id,
+      });
       setMessageContent("");
     } catch (error) {
       console.log(error.response?.data || error.message);
+    }
+  };
+
+  const handleTyping = (e) => {
+    const value = e.target.value;
+
+    setMessageContent(value);
+
+    if (!selectedFriend || !currentUser) {
+      return;
+    }
+
+    if (value.trim()) {
+      socket.emit("typing", {
+        senderId: currentUser._id,
+        receiverId: selectedFriend._id,
+        username: currentUser.username,
+      });
+    } else {
+      socket.emit("stopTyping", {
+        senderId: currentUser._id,
+        receiverId: selectedFriend._id,
+      });
     }
   };
 
@@ -110,6 +138,25 @@ function Chat() {
       socket.off("receiveMessage");
     };
   }, []);
+
+  useEffect(() => {
+    socket.on("userTyping", (data) => {
+      if (selectedFriend && data.senderId === selectedFriend._id) {
+        setTypingUser(data.username);
+      }
+    });
+
+    socket.on("userStoppedTyping", (data) => {
+      if (selectedFriend && data.senderId === selectedFriend._id) {
+        setTypingUser("");
+      }
+    });
+
+    return () => {
+      socket.off("userTyping");
+      socket.off("userStoppedTyping");
+    };
+  }, [selectedFriend]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -193,12 +240,18 @@ function Chat() {
                     <div ref={messagesEndRef}></div>
                   </div>
 
+                  {typingUser && (
+                    <p className="typing-indicator">
+                      {typingUser} {t.isTyping || "is typing..."}
+                    </p>
+                  )}
+
                   <form onSubmit={handleSendMessage} className="chat-form">
                     <input
                       type="text"
                       placeholder={t.writeMessage}
                       value={messageContent}
-                      onChange={(e) => setMessageContent(e.target.value)}
+                      onChange={handleTyping}
                     />
 
                     <button type="submit">{t.send}</button>

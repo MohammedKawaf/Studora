@@ -47,6 +47,14 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("receiveMessage", message);
   });
 
+  socket.on("typing", (data) => {
+    socket.broadcast.emit("userTyping", data);
+  });
+
+  socket.on("stopTyping", (data) => {
+    socket.broadcast.emit("userStoppedTyping", data);
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
