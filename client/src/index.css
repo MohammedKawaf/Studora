@@ -986,3 +986,68 @@ body.dark-mode .chat-message.friend-message {
 .chat-form {
   margin-top: 12px;
 }
+
+.message-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.my-row {
+  justify-content: flex-end;
+}
+
+.friend-row {
+  justify-content: flex-start;
+}
+
+.message-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.message-controls button {
+  border: none;
+  background-color: #1f2937;
+  color: white;
+  border-radius: 999px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.edit-message-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-message-box input {
+  width: 100%;
+}
+
+.deleted-message {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.edited-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.message-row {
+  position: relative;
+  z-index: 2;
+}
+
+.message-controls {
+  position: relative;
+  z-index: 999;
+  pointer-events: auto;
+}
+
+.message-controls button {
+  pointer-events: auto;
+}

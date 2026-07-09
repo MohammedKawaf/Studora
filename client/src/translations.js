@@ -355,6 +355,12 @@ const translations = {
 
     writeMessage: "Write a message...",
     send: "Send",
+
+    messageDeleted: "Message has been deleted",
+    edited: "edited",
+
+    deleteMessage: "Delete message",
+    confirmDeleteMessage: "Are you sure you want to delete this message?",
     },
 
   sv: {
@@ -712,6 +718,12 @@ const translations = {
 
     writeMessage: "Skriv ett meddelande...",
     send: "Skicka",
+
+    messageDeleted: "Meddelandet har raderats",
+    edited: "redigerat",
+
+    deleteMessage: "Radera meddelande",
+    confirmDeleteMessage: "Är du säker på att du vill radera detta meddelande?",
     },
     };
 export default translations;907

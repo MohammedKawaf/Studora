@@ -16,6 +16,12 @@ function Chat() {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [typingUser, setTypingUser] = useState("");
   const [unreadCounts, setUnreadCounts] = useState({});
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editingContent, setEditingContent] = useState("");
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState(null);
+
   const messagesEndRef = useRef(null);
 
   const fetchFriends = async () => {
@@ -23,9 +29,7 @@ function Chat() {
       const token = localStorage.getItem("token");
 
       const response = await api.get("/friends", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setFriends(response.data);
@@ -39,9 +43,7 @@ function Chat() {
       const token = localStorage.getItem("token");
 
       const response = await api.get("/auth/profile", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setCurrentUser(response.data);
@@ -55,9 +57,7 @@ function Chat() {
       const token = localStorage.getItem("token");
 
       const response = await api.get("/messages/unread", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setUnreadCounts(response.data);
@@ -66,23 +66,6 @@ function Chat() {
     }
   };
 
-  useEffect(() => {
-    if (!currentUser) {
-      return;
-    }
-
-    socket.emit("userOnline", currentUser._id);
-
-    socket.on("onlineUsers", (users) => {
-      setOnlineUsers(users);
-    });
-
-    return () => {
-      socket.emit("userOffline", currentUser._id);
-      socket.off("onlineUsers");
-    };
-  }, [currentUser]);
-
   const fetchConversation = async (friend) => {
     try {
       setSelectedFriend(friend);
@@ -90,9 +73,7 @@ function Chat() {
       const token = localStorage.getItem("token");
 
       const response = await api.get(`/messages/${friend._id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setMessages(response.data);
@@ -101,9 +82,7 @@ function Chat() {
         `/messages/read/${friend._id}`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -111,6 +90,8 @@ function Chat() {
         ...prevCounts,
         [friend._id]: 0,
       }));
+
+      window.dispatchEvent(new Event("unreadMessagesUpdated"));
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
@@ -133,22 +114,97 @@ function Chat() {
           content: messageContent.trim(),
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setMessages([...messages, response.data]);
+      setMessages((prevMessages) => [...prevMessages, response.data]);
       socket.emit("sendMessage", response.data);
+
       socket.emit("stopTyping", {
         senderId: currentUser._id,
         receiverId: selectedFriend._id,
       });
+
       setMessageContent("");
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
+  };
+
+  const handleDeleteMessage = async () => {
+    if (!messageToDelete) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.delete(`/messages/${messageToDelete}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          message._id === messageToDelete ? response.data : message
+        )
+      );
+
+      setShowDeleteModal(false);
+      setMessageToDelete(null);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  const handleStartEdit = (message) => {
+    setEditingMessageId(message._id);
+    setEditingContent(message.content);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMessageId(null);
+    setEditingContent("");
+  };
+
+  const handleSaveEdit = async (messageId) => {
+    if (!editingContent.trim()) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await api.put(
+        `/messages/${messageId}`,
+        {
+          content: editingContent.trim(),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          message._id === messageId ? response.data : message
+        )
+      );
+
+      setEditingMessageId(null);
+      setEditingContent("");
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    }
+  };
+
+  const canEditMessage = (message) => {
+    const createdAt = new Date(message.createdAt).getTime();
+    const fiveMinutes = 5 * 60 * 1000;
+
+    return Date.now() - createdAt <= fiveMinutes;
   };
 
   const handleTyping = (e) => {
@@ -181,6 +237,23 @@ function Chat() {
   }, []);
 
   useEffect(() => {
+    if (!currentUser) {
+      return;
+    }
+
+    socket.emit("userOnline", currentUser._id);
+
+    socket.on("onlineUsers", (users) => {
+      setOnlineUsers(users);
+    });
+
+    return () => {
+      socket.emit("userOffline", currentUser._id);
+      socket.off("onlineUsers");
+    };
+  }, [currentUser]);
+
+  useEffect(() => {
     socket.on("receiveMessage", async (newMessage) => {
       if (selectedFriend && newMessage.sender._id === selectedFriend._id) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -192,9 +265,7 @@ function Chat() {
             `/messages/read/${selectedFriend._id}`,
             {},
             {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }
           );
 
@@ -202,6 +273,8 @@ function Chat() {
             ...prevCounts,
             [selectedFriend._id]: 0,
           }));
+
+          window.dispatchEvent(new Event("unreadMessagesUpdated"));
         } catch (error) {
           console.log(error.response?.data || error.message);
         }
@@ -309,17 +382,90 @@ function Chat() {
                     ) : (
                       messages.map((message) => {
                         const isMyMessage =
-                          currentUser &&
-                          message.sender._id === currentUser._id;
+                          currentUser && message.sender._id === currentUser._id;
 
                         return (
                           <div
                             key={message._id}
-                            className={`chat-message ${
-                              isMyMessage ? "my-message" : "friend-message"
+                            className={`message-row ${
+                              isMyMessage ? "my-row" : "friend-row"
                             }`}
                           >
-                            <span>{message.content}</span>
+                            <div
+                              className={`chat-message ${
+                                isMyMessage ? "my-message" : "friend-message"
+                              }`}
+                            >
+                              {message.isDeleted ? (
+                                <span className="deleted-message">
+                                  {t.messageDeleted ||
+                                    "Message has been deleted"}
+                                </span>
+                              ) : editingMessageId === message._id ? (
+                                <div className="edit-message-box">
+                                  <input
+                                    type="text"
+                                    value={editingContent}
+                                    onChange={(e) =>
+                                      setEditingContent(e.target.value)
+                                    }
+                                  />
+
+                                  <div className="message-controls">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleSaveEdit(message._id)
+                                      }
+                                    >
+                                      {t.save}
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={handleCancelEdit}
+                                    >
+                                      {t.cancel}
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <span>{message.content}</span>
+
+                                  {message.isEdited && (
+                                    <small className="edited-label">
+                                      ({t.edited || "edited"})
+                                    </small>
+                                  )}
+                                </>
+                              )}
+                            </div>
+
+                            {isMyMessage &&
+                              !message.isDeleted &&
+                              editingMessageId !== message._id && (
+                                <div className="message-controls">
+                                  {canEditMessage(message) && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleStartEdit(message)}
+                                    >
+                                      ✏️
+                                    </button>
+                                  )}
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setMessageToDelete(message._id);
+                                      setShowDeleteModal(true);
+                                    }}
+                                  >
+                                    🗑️
+                                  </button>
+                                </div>
+                              )}
                           </div>
                         );
                       })
@@ -349,6 +495,35 @@ function Chat() {
             </div>
           </div>
         </section>
+
+        {showDeleteModal && (
+          <div className="modal-overlay">
+            <div className="modal confirm-modal">
+              <h2>🗑️ {t.deleteMessage}</h2>
+
+              <p>{t.confirmDeleteMessage}</p>
+
+              <div className="confirm-modal-actions">
+                <button
+                  className="secondary-button"
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setMessageToDelete(null);
+                  }}
+                >
+                  {t.cancel}
+                </button>
+
+                <button
+                  className="danger-button"
+                  onClick={handleDeleteMessage}
+                >
+                  {t.delete}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

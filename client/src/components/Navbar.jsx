@@ -44,12 +44,17 @@ function Navbar({ user }) {
   }, [user]);
 
   useEffect(() => {
-    socket.on("receiveMessage", () => {
+    const updateUnread = () => {
       fetchUnreadMessages();
-    });
+    };
+
+    socket.on("receiveMessage", updateUnread);
+
+    window.addEventListener("unreadMessagesUpdated", updateUnread);
 
     return () => {
-      socket.off("receiveMessage");
+      socket.off("receiveMessage", updateUnread);
+      window.removeEventListener("unreadMessagesUpdated", updateUnread);
     };
   }, []);
 
