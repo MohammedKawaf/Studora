@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../services/api";
 import translations from "../translations";
 
@@ -12,6 +12,7 @@ function Chat() {
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const messagesEndRef = useRef(null);
 
   const fetchFriends = async () => {
     try {
@@ -58,7 +59,6 @@ function Chat() {
       });
 
       setMessages(response.data);
-      console.log(response.data);
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
@@ -98,6 +98,12 @@ function Chat() {
     fetchFriends();
     fetchCurrentUser();
   }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
 
   return (
     <div>
@@ -171,6 +177,8 @@ function Chat() {
                         );
                       })
                     )}
+
+                    <div ref={messagesEndRef}></div>
                   </div>
 
                   <form onSubmit={handleSendMessage} className="chat-form">
