@@ -969,3 +969,20 @@ body.dark-mode .chat-message.friend-message {
   margin-left: 8px;
   font-weight: 700;
 }
+
+.chat-window {
+  height: 620px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  scroll-behavior: smooth;
+}
+
+.chat-form {
+  margin-top: 12px;
+}
