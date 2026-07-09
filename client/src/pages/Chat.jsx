@@ -13,6 +13,7 @@ function Chat() {
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const [typingUser, setTypingUser] = useState("");
   const messagesEndRef = useRef(null);
 
@@ -47,6 +48,23 @@ function Chat() {
       console.log(error.response?.data || error.message);
     }
   };
+
+  useEffect(() => {
+    if (!currentUser) {
+      return;
+    }
+
+    socket.emit("userOnline", currentUser._id);
+
+    socket.on("onlineUsers", (users) => {
+      setOnlineUsers(users);
+    });
+
+    return () => {
+      socket.emit("userOffline", currentUser._id);
+      socket.off("onlineUsers");
+    };
+  }, [currentUser]);
 
   const fetchConversation = async (friend) => {
     try {
@@ -202,7 +220,10 @@ function Chat() {
                       </span>
                     )}
 
-                    <span>{friend.username}</span>
+                    <span>
+                      {onlineUsers.includes(friend._id) ? "🟢 " : "⚪ "}
+                      {friend.username}
+                    </span>
                   </button>
                 ))
               )}

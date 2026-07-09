@@ -40,8 +40,16 @@ app.use("/api/grades", gradeRoutes);
 app.use("/api/friends", friendRoutes);
 app.use("/api/messages", messageRoutes);
 
+const onlineUsers = new Map();
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
+
+  socket.on("userOnline", (userId) => {
+    onlineUsers.set(userId, socket.id);
+
+    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
+  });
 
   socket.on("sendMessage", (message) => {
     socket.broadcast.emit("receiveMessage", message);
@@ -55,7 +63,22 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("userStoppedTyping", data);
   });
 
+  socket.on("userOffline", (userId) => {
+    onlineUsers.delete(userId);
+
+    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
+  });
+
   socket.on("disconnect", () => {
+    for (const [userId, socketId] of onlineUsers.entries()) {
+      if (socketId === socket.id) {
+        onlineUsers.delete(userId);
+        break;
+      }
+    }
+
+    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
+
     console.log("User disconnected:", socket.id);
   });
 });
